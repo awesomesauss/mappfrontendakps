@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #000000;
+    --foreground: #fafafa;
+  }
+
+  body {
+    background-color: #000000;
+    color: #fafafa;
+  }
+}
+
+.font-vt323 {
+  font-family: var(--font-vt323), monospace;
+}
+
+.font-share-tech {
+  font-family: var(--font-share-tech), monospace;
+}
+
+/* CRT Scanline Text Mask from Image */
+.scanline-text {
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffffff 50%,
+    #a1a1aa 51%,
+    #e4e4e7 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  position: relative;
+}
+
+.scanline-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.4) 0px,
+    rgba(0, 0, 0, 0.4) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+}
+
+/* Minimalist Clean Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}

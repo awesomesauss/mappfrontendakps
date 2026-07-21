@@ -1,0 +1,104 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { GlassCard } from '@/components/ui/glass-card';
+import { WeatherData } from '@/lib/types';
+import { CloudSun, CloudRain, Sun, Wind, Droplets, RefreshCw, MapPin } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export function WeatherWidget() {
+  const [weather, setWeather] = useState<WeatherData>({
+    city: 'San Francisco',
+    temp: 22,
+    condition: 'Partly Cloudy',
+    humidity: 62,
+    windSpeed: 12,
+    high: 25,
+    low: 17,
+    isMock: true,
+  });
+  const [loading, setLoading] = useState(false);
+
+  const fetchWeather = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/weather?city=San%20Francisco');
+      if (res.ok) {
+        const data = await res.json();
+        setWeather(data);
+      }
+    } catch {
+      // Keep existing mock fallback
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeather();
+  }, []);
+
+  const getWeatherIcon = (condition: string) => {
+    const c = condition.toLowerCase();
+    if (c.includes('rain') || c.includes('drizzle')) return <CloudRain className="w-10 h-10 text-cyan-400" />;
+    if (c.includes('cloud')) return <CloudSun className="w-10 h-10 text-amber-400" />;
+    return <Sun className="w-10 h-10 text-yellow-400" />;
+  };
+
+  return (
+    <GlassCard glowColor="blue" className="flex flex-col justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-cyan-400" />
+          <span className="text-sm font-semibold text-white font-mono">{weather.city}</span>
+          {weather.isMock && (
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+              MOCK API
+            </span>
+          )}
+        </div>
+        <button
+          onClick={fetchWeather}
+          disabled={loading}
+          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+        >
+          <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
+        </button>
+      </div>
+
+      {/* Main Condition Display */}
+      <div className="my-4 flex items-center justify-between">
+        <div>
+          <div className="text-4xl font-extrabold text-white font-mono tracking-tight">
+            {weather.temp}°C
+          </div>
+          <p className="text-xs text-slate-300 font-medium font-mono mt-0.5">{weather.condition}</p>
+        </div>
+
+        <div className="p-3 rounded-2xl bg-white/5 backdrop-blur-md">
+          {getWeatherIcon(weather.condition)}
+        </div>
+      </div>
+
+      {/* Weather Stats Grid */}
+      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/5 font-mono text-xs">
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-900/50">
+          <Droplets className="w-4 h-4 text-cyan-400" />
+          <div>
+            <div className="text-[10px] text-slate-500 uppercase">Humidity</div>
+            <div className="text-white font-semibold">{weather.humidity}%</div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-900/50">
+          <Wind className="w-4 h-4 text-emerald-400" />
+          <div>
+            <div className="text-[10px] text-slate-500 uppercase">Wind</div>
+            <div className="text-white font-semibold">{weather.windSpeed} km/h</div>
+          </div>
+        </div>
+      </div>
+    </GlassCard>
+  );
+}
