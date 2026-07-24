@@ -1,53 +1,40 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const city = searchParams.get('city') || 'San Francisco';
-  const apiKey = process.env.OPENWEATHER_API_KEY;
+// data.gov.sg NEA 24-hour forecast — Singapore only, no API key required.
+// x-api-key is optional and only raises the rate limit; omit it entirely.
+const NEA_FORECAST_URL =
+  'https://api-open.data.gov.sg/v2/real-time/api/twenty-four-hr-forecast';
 
-  if (!apiKey) {
-    // Return realistic mock weather dataset
-    return NextResponse.json({
-      city,
-      temp: 22,
-      condition: 'Partly Cloudy',
-      humidity: 62,
-      windSpeed: 14,
-      high: 25,
-      low: 17,
-      isMock: true,
-    });
-  }
-
+export async function GET() {
   try {
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
-        city
-      )}&units=metric&appid=${apiKey}`
-    );
+    const res = await fetch(NEA_FORECAST_URL);
     if (!res.ok) {
       throw new Error('Weather API error');
     }
-    const data = await res.json();
+    const json = await res.json();
+    const general = json.data.records[0].general;
+
     return NextResponse.json({
-      city: data.name,
-      temp: Math.round(data.main.temp),
-      condition: data.weather[0].main,
-      humidity: data.main.humidity,
-      windSpeed: Math.round(data.wind.speed * 3.6),
-      high: Math.round(data.main.temp_max),
-      low: Math.round(data.main.temp_min),
+      city: 'Singapore',
+      temp: Math.round((general.temperature.low + general.temperature.high) / 2),
+      condition: general.forecast.text,
+      humidity: Math.round(
+        (general.relativeHumidity.low + general.relativeHumidity.high) / 2
+      ),
+      windSpeed: Math.round((general.wind.speed.low + general.wind.speed.high) / 2),
+      high: general.temperature.high,
+      low: general.temperature.low,
       isMock: false,
     });
   } catch {
     return NextResponse.json({
-      city,
-      temp: 21,
-      condition: 'Clear Sky',
-      humidity: 58,
-      windSpeed: 10,
-      high: 24,
-      low: 16,
+      city: 'Singapore',
+      temp: 28,
+      condition: 'Partly Cloudy',
+      humidity: 75,
+      windSpeed: 15,
+      high: 31,
+      low: 26,
       isMock: true,
     });
   }

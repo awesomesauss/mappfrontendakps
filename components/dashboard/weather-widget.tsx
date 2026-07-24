@@ -8,13 +8,13 @@ import { cn } from '@/lib/utils';
 
 export function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData>({
-    city: 'San Francisco',
-    temp: 22,
+    city: 'Singapore',
+    temp: 28,
     condition: 'Partly Cloudy',
-    humidity: 62,
-    windSpeed: 12,
-    high: 25,
-    low: 17,
+    humidity: 75,
+    windSpeed: 15,
+    high: 31,
+    low: 26,
     isMock: true,
   });
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export function WeatherWidget() {
   const fetchWeather = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/weather?city=San%20Francisco');
+      const res = await fetch('/api/weather');
       if (res.ok) {
         const data = await res.json();
         setWeather(data);
@@ -40,8 +40,13 @@ export function WeatherWidget() {
 
   const getWeatherIcon = (condition: string) => {
     const c = condition.toLowerCase();
-    if (c.includes('rain') || c.includes('drizzle')) return <CloudRain className="w-10 h-10 text-cyan-400" />;
-    if (c.includes('cloud')) return <CloudSun className="w-10 h-10 text-amber-400" />;
+    if (c.includes('rain') || c.includes('drizzle') || c.includes('shower') || c.includes('thundery')) {
+      return <CloudRain className="w-10 h-10 text-cyan-400" />;
+    }
+    if (c.includes('windy')) return <Wind className="w-10 h-10 text-emerald-400" />;
+    if (c.includes('cloud') || c.includes('hazy') || c.includes('mist') || c.includes('fog')) {
+      return <CloudSun className="w-10 h-10 text-amber-400" />;
+    }
     return <Sun className="w-10 h-10 text-yellow-400" />;
   };
 
