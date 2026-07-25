@@ -199,9 +199,142 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setLogs([]);
   }, []);
 
+  // Pull the real device_states row instead of starting from hardcoded defaults
+  useEffect(() => {
+    if (!supabaseConnected || !supabase || isMockMode) return;
+
+    supabase
+      .from('device_states')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+        setDeviceState({
+          gateServo: data.gate_servo,
+          mainLighting: data.main_lighting,
+          lightingBrightness: data.lighting_brightness,
+          hvacPower: data.hvac_power,
+          hvacTargetTemp: data.hvac_target_temp,
+          smartLock: data.smart_lock,
+          securityArmState: data.security_arm_state,
+        });
+      });
+  }, [supabaseConnected, isMockMode]);
+
+  // Fetch + live-subscribe to real sensor telemetry from Supabase (STM32 -> relay -> here)
+  useEffect(() => {
+    if (!supabaseConnected || !supabase || isMockMode) return;
+    const client = supabase;
+
+    const toPoint = (row: {
+      created_at: string;
+      temperature: number;
+      humidity: number;
+      power: number;
+    }): TelemetryHistoryPoint => ({
+      time: new Date(row.created_at).toLocaleTimeString([], { hour12: false }),
+      temperature: Number(row.temperature),
+      humidity: Number(row.humidity),
+      power: Number(row.power),
+    });
+
+    client
+      .from('sensor_telemetry')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(24)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setTelemetryHistory([...data].reverse().map(toPoint));
+        const latest = data[0];
+        setSensorData({
+          temperature: Number(latest.temperature),
+          humidity: Number(latest.humidity),
+          power: Number(latest.power),
+          timestamp: new Date(latest.created_at).toLocaleTimeString([], { hour12: false }),
+        });
+      });
+
+    const channel = client
+      .channel('sensor_telemetry_changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'sensor_telemetry' },
+        (payload) => {
+          const row = payload.new as {
+            created_at: string;
+            temperature: number;
+            humidity: number;
+            power: number;
+          };
+          setSensorData({
+            temperature: Number(row.temperature),
+            humidity: Number(row.humidity),
+            power: Number(row.power),
+            timestamp: new Date(row.created_at).toLocaleTimeString([], { hour12: false }),
+          });
+          setTelemetryHistory((prev) => [...prev.slice(-23), toPoint(row)]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      client.removeChannel(channel);
+    };
+  }, [supabaseConnected, isMockMode]);
+
+  // Fetch + live-subscribe to real alert logs from Supabase (RFID scans, etc.)
+  useEffect(() => {
+    if (!supabaseConnected || !supabase || isMockMode) return;
+    const client = supabase;
+
+    client
+      .from('alert_logs')
+      .select('*')
+      .order('timestamp', { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        if (!data) return;
+        setLogs(
+          data.map((row: AlertLog) => ({
+            id: row.id,
+            timestamp: new Date(row.timestamp).toLocaleTimeString([], { hour12: false }),
+            level: row.level,
+            message: row.message,
+            category: row.category,
+          }))
+        );
+      });
+
+    const channel = client
+      .channel('alert_logs_changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'alert_logs' },
+        (payload) => {
+          const row = payload.new as AlertLog;
+          const newLog: AlertLog = {
+            id: row.id,
+            timestamp: new Date(row.timestamp).toLocaleTimeString([], { hour12: false }),
+            level: row.level,
+            message: row.message,
+            category: row.category,
+          };
+          setLogs((prev) => [newLog, ...prev.slice(0, 49)]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      client.removeChannel(channel);
+    };
+  }, [supabaseConnected, isMockMode]);
+
   // Hardware Simulation Loop (Simulating STM32/ESP-01 Telemetry Stream every 3 seconds)
   useEffect(() => {
     if (!isSimulating) return;
+    if (supabaseConnected && !isMockMode) return; // real hardware data is live -- don't fake it
 
     const interval = setInterval(() => {
       setSensorData((prev) => {
