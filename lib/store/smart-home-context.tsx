@@ -225,6 +225,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   // Fetch + live-subscribe to real sensor telemetry from Supabase (STM32 -> relay -> here)
   useEffect(() => {
     if (!supabaseConnected || !supabase || isMockMode) return;
+    const client = supabase;
 
     const toPoint = (row: {
       created_at: string;
@@ -238,7 +239,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       power: Number(row.power),
     });
 
-    supabase
+    client
       .from('sensor_telemetry')
       .select('*')
       .order('created_at', { ascending: false })
@@ -255,7 +256,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         });
       });
 
-    const channel = supabase
+    const channel = client
       .channel('sensor_telemetry_changes')
       .on(
         'postgres_changes',
@@ -279,15 +280,16 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [supabaseConnected, isMockMode]);
 
   // Fetch + live-subscribe to real alert logs from Supabase (RFID scans, etc.)
   useEffect(() => {
     if (!supabaseConnected || !supabase || isMockMode) return;
+    const client = supabase;
 
-    supabase
+    client
       .from('alert_logs')
       .select('*')
       .order('timestamp', { ascending: false })
@@ -305,7 +307,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         );
       });
 
-    const channel = supabase
+    const channel = client
       .channel('alert_logs_changes')
       .on(
         'postgres_changes',
@@ -325,7 +327,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [supabaseConnected, isMockMode]);
 
