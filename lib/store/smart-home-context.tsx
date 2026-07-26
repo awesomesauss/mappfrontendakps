@@ -131,7 +131,25 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setDeviceState((prev) => {
       const next = updater(prev);
       if (supabaseConnected && supabase && !isMockMode) {
-        supabase.from('device_states').upsert([{ id: 1, ...next, updated_at: new Date().toISOString() }]).then();
+        // device_states columns are snake_case; DeviceState is camelCase, so map explicitly
+        // instead of spreading -- a raw spread sends camelCase keys PostgREST doesn't
+        // recognize and the upsert is rejected outright (silently, since there's no .catch()).
+        supabase
+          .from('device_states')
+          .upsert([{
+            id: 1,
+            gate_servo: next.gateServo,
+            main_lighting: next.mainLighting,
+            lighting_brightness: next.lightingBrightness,
+            hvac_power: next.hvacPower,
+            hvac_target_temp: next.hvacTargetTemp,
+            smart_lock: next.smartLock,
+            security_arm_state: next.securityArmState,
+            updated_at: new Date().toISOString(),
+          }])
+          .then(({ error }) => {
+            if (error) console.error('[Supabase] device_states upsert failed:', error);
+          });
       }
       return next;
     });
