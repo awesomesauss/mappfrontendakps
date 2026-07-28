@@ -49,7 +49,7 @@ function SwitchTile({
         onCheckedChange={onCheckedChange}
         activeColor={activeColor}
         size="sm"
-        className="shrink-0 mt-[5px]"
+        className="shrink-0"
       />
     </div>
   );
