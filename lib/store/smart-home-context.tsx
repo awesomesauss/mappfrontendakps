@@ -41,7 +41,7 @@ const initialLogs: AlertLog[] = [
     id: '2',
     timestamp: new Date(Date.now() - 15 * 60 * 1000).toLocaleTimeString([], { hour12: false }),
     level: 'info',
-    message: 'Gate Servo closed automatically via auto-timer',
+    message: 'Blind closed automatically via auto-timer',
     category: 'control',
   },
   {
@@ -69,7 +69,7 @@ interface SmartHomeContextType {
   isMockMode: boolean;
   isSimulating: boolean;
   supabaseConnected: boolean;
-  toggleGateServo: () => void;
+  toggleBlind: () => void;
   toggleMainLighting: () => void;
   setLightingBrightness: (val: number) => void;
   toggleHvacPower: () => void;
@@ -90,7 +90,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   const [supabaseConnected] = useState<boolean>(isSupabaseConfigured);
 
   const [deviceState, setDeviceState] = useState<DeviceState>({
-    gateServo: false,
+    blind: false,
     mainLighting: true,
     lightingBrightness: 80,
     hvacPower: true,
@@ -138,7 +138,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
           .from('device_states')
           .upsert([{
             id: 1,
-            gate_servo: next.gateServo,
+            blind: next.blind,
             main_lighting: next.mainLighting,
             lighting_brightness: next.lightingBrightness,
             hvac_power: next.hvacPower,
@@ -156,12 +156,12 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     addLog(actionDescription, 'info', 'control');
   }, [supabaseConnected, isMockMode, addLog]);
 
-  const toggleGateServo = useCallback(() => {
+  const toggleBlind = useCallback(() => {
     updateDeviceState(
-      (prev) => ({ ...prev, gateServo: !prev.gateServo }),
-      `Door Lock: ${!deviceState.gateServo ? 'LOCKED' : 'UNLOCKED'}`
+      (prev) => ({ ...prev, blind: !prev.blind }),
+      `Door Lock: ${!deviceState.blind ? 'LOCKED' : 'UNLOCKED'}`
     );
-  }, [deviceState.gateServo, updateDeviceState]);
+  }, [deviceState.blind, updateDeviceState]);
 
   const toggleMainLighting = useCallback(() => {
     updateDeviceState(
@@ -229,7 +229,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       .then(({ data }) => {
         if (!data) return;
         setDeviceState({
-          gateServo: data.gate_servo,
+          blind: data.blind,
           mainLighting: data.main_lighting,
           lightingBrightness: data.lighting_brightness,
           hvacPower: data.hvac_power,
@@ -406,7 +406,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         isMockMode,
         isSimulating,
         supabaseConnected,
-        toggleGateServo,
+        toggleBlind,
         toggleMainLighting,
         setLightingBrightness,
         toggleHvacPower,

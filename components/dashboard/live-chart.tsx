@@ -67,7 +67,6 @@ function CustomTooltip({ active, payload, label, unit }: any) {
 
 export function LiveChart({ data }: LiveChartProps) {
   const [activeMetric, setActiveMetric] = useState<MetricKey>('temperature');
-  const [timeframe, setTimeframe] = useState<'1h' | '24h' | '7d'>('24h');
 
   const currentMetric = metricConfig[activeMetric];
 
@@ -155,25 +154,10 @@ export function LiveChart({ data }: LiveChartProps) {
       </div>
 
       {/* Footer controls */}
-      <div className="mt-3 pt-3 border-t border-app flex items-center justify-between text-xs text-muted font-mono">
+      <div className="mt-3 pt-3 border-t border-app flex items-center text-xs text-muted font-mono">
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
           <span className="text-secondary font-medium">Socket Streaming</span>
-        </div>
-
-        <div className="flex items-center gap-1 bg-elevated p-0.5 rounded-lg">
-          {(['1h', '24h', '7d'] as const).map((tf) => (
-            <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
-              className={cn(
-                'px-2 py-0.5 rounded text-[10px] uppercase font-mono transition-colors',
-                timeframe === tf ? 'bg-elevated text-app font-semibold' : 'text-dim hover:text-secondary'
-              )}
-            >
-              {tf}
-            </button>
-          ))}
         </div>
       </div>
     </GlassCard>

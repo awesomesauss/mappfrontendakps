@@ -58,7 +58,7 @@ function SwitchTile({
 export function CommandCenter() {
   const {
     deviceState,
-    toggleGateServo,
+    toggleBlind,
     toggleMainLighting,
     setLightingBrightness,
     toggleHvacPower,
@@ -88,20 +88,20 @@ export function CommandCenter() {
       {/* Switch Stack — single column for narrow panel */}
       <div className="grid grid-cols-1 gap-2 flex-1">
         <SwitchTile
-          icon={deviceState.gateServo ? <DoorOpen className="w-3.5 h-3.5" /> : <DoorClosed className="w-3.5 h-3.5" />}
+          icon={deviceState.blind ? <DoorOpen className="w-3.5 h-3.5" /> : <DoorClosed className="w-3.5 h-3.5" />}
           iconClassName={
-            deviceState.gateServo ? 'bg-blue-600/20 text-blue-400' : 'bg-elevated text-muted'
+            deviceState.blind ? 'bg-blue-600/20 text-blue-400' : 'bg-elevated text-muted'
           }
           label="Door Lock"
           status={
             <>
-              <span className={deviceState.gateServo ? 'text-blue-400 font-medium' : 'text-dim'}>
-                {deviceState.gateServo ? 'LOCKED' : 'UNLOCKED'}
+              <span className={deviceState.blind ? 'text-blue-400 font-medium' : 'text-dim'}>
+                {deviceState.blind ? 'LOCKED' : 'UNLOCKED'}
               </span>
             </>
           }
-          checked={deviceState.gateServo}
-          onCheckedChange={toggleGateServo}
+          checked={deviceState.blind}
+          onCheckedChange={toggleBlind}
           activeColor="blue"
         />
 
