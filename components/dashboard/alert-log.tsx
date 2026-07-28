@@ -45,15 +45,15 @@ export function AlertLog() {
               <Bell className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-zinc-100 font-mono">Hardware Event Feed</h3>
-              <p className="text-[11px] text-zinc-400 font-mono">Real-time system interrupts & logs</p>
+              <h3 className="text-sm font-semibold text-app font-mono">Hardware Event Feed</h3>
+              <p className="text-[11px] text-muted font-mono">Real-time system interrupts & logs</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={triggerMockRfidScan}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-mono transition-colors font-medium"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-elevated dark:hover:bg-zinc-700 hover:bg-zinc-200 text-secondary text-xs font-mono transition-colors font-medium"
             >
               <KeyRound className="w-3.5 h-3.5 text-blue-400" />
               <span>Simulate RFID</span>
@@ -61,7 +61,7 @@ export function AlertLog() {
             <button
               onClick={clearLogs}
               title="Clear Logs"
-              className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="p-1.5 rounded-lg bg-elevated dark:hover:bg-zinc-700 hover:bg-zinc-200 text-muted hover:text-secondary transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -69,7 +69,7 @@ export function AlertLog() {
         </div>
 
         {/* Category Filters */}
-        <div className="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-xl mb-3 font-mono text-xs">
+        <div className="flex items-center gap-1 bg-elevated p-1 rounded-xl mb-3 font-mono text-xs">
           {(['all', 'rfid', 'sensor', 'control'] as const).map((cat) => (
             <button
               key={cat}
@@ -77,8 +77,8 @@ export function AlertLog() {
               className={cn(
                 'px-2.5 py-0.5 rounded-lg uppercase text-[10px] transition-colors',
                 filter === cat
-                  ? 'bg-zinc-800 text-zinc-100 font-semibold'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-elevated text-app font-semibold'
+                  : 'text-muted hover:text-secondary'
               )}
             >
               {cat}
@@ -91,7 +91,7 @@ export function AlertLog() {
       <div className="max-h-64 min-h-48 overflow-y-auto pr-1 space-y-2 font-mono text-xs">
         <AnimatePresence initial={false}>
           {filteredLogs.length === 0 ? (
-            <div className="py-8 text-center text-zinc-500">
+            <div className="py-8 text-center text-dim">
               No events recorded for this category.
             </div>
           ) : (
@@ -105,18 +105,18 @@ export function AlertLog() {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
-                  className="p-2.5 rounded-xl bg-zinc-950/60 flex items-start gap-2.5 text-xs"
+                  className="p-2.5 rounded-xl bg-elevated flex items-start gap-2.5 text-xs"
                 >
                   <div className={cn('p-1 rounded mt-0.5 flex-shrink-0', badge.bg)}>
                     <BadgeIcon className="w-3 h-3" />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="text-zinc-200 leading-snug">{log.message}</div>
-                    <div className="flex items-center gap-2 mt-1 text-[10px] text-zinc-500">
+                    <div className="text-secondary leading-snug">{log.message}</div>
+                    <div className="flex items-center gap-2 mt-1 text-[10px] text-dim">
                       <span>{log.timestamp}</span>
                       <span>•</span>
-                      <span className="uppercase text-zinc-400">{log.category}</span>
+                      <span className="uppercase text-muted">{log.category}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -127,7 +127,7 @@ export function AlertLog() {
       </div>
 
       {/* Footer info */}
-      <div className="mt-3 pt-3 border-t border-zinc-800/30 flex items-center justify-between text-[11px] font-mono text-zinc-500">
+      <div className="mt-3 pt-3 border-t border-app flex items-center justify-between text-[11px] font-mono text-dim">
         <div className="flex items-center gap-1.5">
           <Radio className="w-3 h-3 text-blue-400" />
           <span>UART / WebSockets Active</span>

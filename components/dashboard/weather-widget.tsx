@@ -43,7 +43,7 @@ export function WeatherWidget() {
     if (c.includes('rain') || c.includes('drizzle') || c.includes('shower') || c.includes('thundery')) {
       return <CloudRain className="w-10 h-10 text-cyan-400" />;
     }
-    if (c.includes('windy')) return <Wind className="w-10 h-10 text-emerald-400" />;
+    if (c.includes('windy')) return <Wind className="w-10 h-10 text-cyan-400" />;
     if (c.includes('cloud') || c.includes('hazy') || c.includes('mist') || c.includes('fog')) {
       return <CloudSun className="w-10 h-10 text-amber-400" />;
     }
@@ -56,9 +56,9 @@ export function WeatherWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-cyan-400" />
-          <span className="text-sm font-semibold text-white font-mono">{weather.city}</span>
+          <span className="text-sm font-semibold text-app font-mono">{weather.city}</span>
           {weather.isMock && (
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-elevated text-muted">
               MOCK API
             </span>
           )}
@@ -66,7 +66,7 @@ export function WeatherWidget() {
         <button
           onClick={fetchWeather}
           disabled={loading}
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+          className="p-1.5 rounded-lg bg-elevated dark:hover:bg-white/10 hover:bg-zinc-200/50 text-muted hover:text-app transition-all"
         >
           <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
         </button>
@@ -75,32 +75,32 @@ export function WeatherWidget() {
       {/* Main Condition Display */}
       <div className="my-4 flex items-center justify-between">
         <div>
-          <div className="text-4xl font-extrabold text-white font-mono tracking-tight">
+          <div className="text-4xl font-extrabold text-app font-mono tracking-tight">
             {weather.temp}°C
           </div>
-          <p className="text-xs text-slate-300 font-medium font-mono mt-0.5">{weather.condition}</p>
+          <p className="text-xs text-secondary font-medium font-mono mt-0.5">{weather.condition}</p>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white/5 backdrop-blur-md">
+        <div className="p-3 rounded-2xl bg-elevated backdrop-blur-md">
           {getWeatherIcon(weather.condition)}
         </div>
       </div>
 
       {/* Weather Stats Grid */}
-      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/5 font-mono text-xs">
-        <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-900/50">
+      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-app font-mono text-xs">
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-elevated">
           <Droplets className="w-4 h-4 text-cyan-400" />
           <div>
-            <div className="text-[10px] text-slate-500 uppercase">Humidity</div>
-            <div className="text-white font-semibold">{weather.humidity}%</div>
+            <div className="text-[10px] text-dim uppercase">Humidity</div>
+            <div className="text-app font-semibold">{weather.humidity}%</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-900/50">
-          <Wind className="w-4 h-4 text-emerald-400" />
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-elevated">
+          <Wind className="w-4 h-4 text-cyan-400" />
           <div>
-            <div className="text-[10px] text-slate-500 uppercase">Wind</div>
-            <div className="text-white font-semibold">{weather.windSpeed} km/h</div>
+            <div className="text-[10px] text-dim uppercase">Wind</div>
+            <div className="text-app font-semibold">{weather.windSpeed} km/h</div>
           </div>
         </div>
       </div>

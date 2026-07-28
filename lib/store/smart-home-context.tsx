@@ -159,7 +159,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   const toggleGateServo = useCallback(() => {
     updateDeviceState(
       (prev) => ({ ...prev, gateServo: !prev.gateServo }),
-      `Gate Servo command executed: ${!deviceState.gateServo ? 'OPENED' : 'CLOSED'}`
+      `Door Lock: ${!deviceState.gateServo ? 'LOCKED' : 'UNLOCKED'}`
     );
   }, [deviceState.gateServo, updateDeviceState]);
 

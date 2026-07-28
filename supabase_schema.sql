@@ -1,4 +1,4 @@
--- Aurora Smart Home Command Center Supabase Database Schema
+-- ASS (Automatic Solar System) Command Center Supabase Database Schema
 -- Run this SQL in your Supabase SQL Editor to connect real STM32 / ESP-01 hardware
 
 -- 1. Create Telemetry Table for Environmental Sensors

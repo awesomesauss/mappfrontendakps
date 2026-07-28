@@ -51,12 +51,12 @@ const metricConfig: Record<
 function CustomTooltip({ active, payload, label, unit }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl bg-zinc-950 p-3 shadow-md font-mono text-xs">
-        <p className="text-zinc-400 mb-1 flex items-center gap-1">
+      <div className="rounded-xl bg-card p-3 shadow-md font-mono text-xs">
+        <p className="text-muted mb-1 flex items-center gap-1">
           <Clock className="w-3 h-3 text-blue-400" />
           <span>{label}</span>
         </p>
-        <p className="text-zinc-100 font-bold text-sm">
+        <p className="text-app font-bold text-sm">
           {payload[0].value} {unit}
         </p>
       </div>
@@ -80,15 +80,15 @@ export function LiveChart({ data }: LiveChartProps) {
             <Activity className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-zinc-100 font-mono">
+            <h3 className="text-sm font-semibold text-app font-mono">
               Environmental Telemetry Stream
             </h3>
-            <p className="text-[11px] text-zinc-400 font-mono">Rolling 24-hour sensor log</p>
+            <p className="text-[11px] text-muted font-mono">Rolling 24-hour sensor log</p>
           </div>
         </div>
 
         {/* Metric Selector Tabs */}
-        <div className="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-xl self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-elevated p-1 rounded-xl self-start sm:self-auto">
           {(Object.keys(metricConfig) as MetricKey[]).map((key) => (
             <button
               key={key}
@@ -96,8 +96,8 @@ export function LiveChart({ data }: LiveChartProps) {
               className={cn(
                 'px-3 py-1 text-xs font-mono rounded-lg transition-colors',
                 activeMetric === key
-                  ? 'bg-zinc-800 text-zinc-100 font-semibold'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-elevated text-app font-semibold'
+                  : 'text-muted hover:text-secondary'
               )}
             >
               {metricConfig[key].label}
@@ -155,20 +155,20 @@ export function LiveChart({ data }: LiveChartProps) {
       </div>
 
       {/* Footer controls */}
-      <div className="mt-3 pt-3 border-t border-zinc-800/30 flex items-center justify-between text-xs text-zinc-400 font-mono">
+      <div className="mt-3 pt-3 border-t border-app flex items-center justify-between text-xs text-muted font-mono">
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
-          <span className="text-zinc-300 font-medium">Socket Streaming</span>
+          <span className="text-secondary font-medium">Socket Streaming</span>
         </div>
 
-        <div className="flex items-center gap-1 bg-zinc-950/60 p-0.5 rounded-lg">
+        <div className="flex items-center gap-1 bg-elevated p-0.5 rounded-lg">
           {(['1h', '24h', '7d'] as const).map((tf) => (
             <button
               key={tf}
               onClick={() => setTimeframe(tf)}
               className={cn(
                 'px-2 py-0.5 rounded text-[10px] uppercase font-mono transition-colors',
-                timeframe === tf ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-500 hover:text-zinc-300'
+                timeframe === tf ? 'bg-elevated text-app font-semibold' : 'text-dim hover:text-secondary'
               )}
             >
               {tf}

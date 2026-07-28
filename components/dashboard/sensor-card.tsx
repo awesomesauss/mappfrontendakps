@@ -30,7 +30,7 @@ export function SensorCard({ title, value, unit, trend, type, updatedAt }: Senso
     <GlassCard className="flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">
+          <span className="text-xs font-mono uppercase tracking-wider text-muted font-semibold">
             {title}
           </span>
           <div className={cn('p-2 rounded-lg border', current.iconBg, current.iconColor)}>
@@ -39,14 +39,14 @@ export function SensorCard({ title, value, unit, trend, type, updatedAt }: Senso
         </div>
 
         <div className="flex items-baseline gap-1.5 my-1">
-          <span className="text-3xl font-extrabold tracking-tight text-zinc-100 font-mono">
+          <span className="text-3xl font-extrabold tracking-tight text-app font-mono">
             {value}
           </span>
-          <span className="text-sm font-semibold text-zinc-400 font-mono">{unit}</span>
+          <span className="text-sm font-semibold text-muted font-mono">{unit}</span>
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs font-mono">
+      <div className="mt-4 pt-3 border-t border-app flex items-center justify-between text-xs font-mono">
         <div
           className={cn(
             'inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-medium text-[11px]',
@@ -62,7 +62,7 @@ export function SensorCard({ title, value, unit, trend, type, updatedAt }: Senso
           </span>
         </div>
 
-        <span className="text-[10px] text-zinc-500">Sync: {updatedAt}</span>
+        <span className="text-[10px] text-dim">Sync: {updatedAt}</span>
       </div>
     </GlassCard>
   );
