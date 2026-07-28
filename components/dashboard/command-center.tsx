@@ -132,10 +132,10 @@ export function CommandCenter() {
         <div className="p-2.5 rounded-xl bg-elevated min-h-[3.25rem] flex flex-col justify-center">
           <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
             <span className="text-secondary flex items-center gap-1 font-medium">
-              <SunMedium className="w-3 h-3 text-amber-400" />
+              <SunMedium className="w-3 h-3 text-yellow-400" />
               Brightness
             </span>
-            <span className="text-amber-400 font-semibold">{deviceState.lightingBrightness}%</span>
+            <span className="text-yellow-400 font-semibold">{deviceState.lightingBrightness}%</span>
           </div>
           <input
             type="range"
@@ -144,7 +144,7 @@ export function CommandCenter() {
             disabled={!deviceState.mainLighting}
             value={deviceState.lightingBrightness}
             onChange={(e) => setLightingBrightness(Number(e.target.value))}
-            className="w-full h-1 bg-zinc-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-amber-500 disabled:opacity-30"
+            className="w-full h-1 bg-zinc-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-yellow-400 disabled:opacity-30"
           />
         </div>
 

@@ -6,7 +6,6 @@ import { useSmartHome } from '@/lib/store/smart-home-context';
 import { AlertLog as AlertLogType } from '@/lib/types';
 import {
   Bell,
-  KeyRound,
   AlertTriangle,
   Info,
   CheckCircle,
@@ -17,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function AlertLog() {
-  const { logs, triggerMockRfidScan, clearLogs } = useSmartHome();
+  const { logs, clearLogs } = useSmartHome();
   const [filter, setFilter] = useState<'all' | 'rfid' | 'sensor' | 'control'>('all');
 
   const filteredLogs = logs.filter((log) => (filter === 'all' ? true : log.category === filter));
@@ -51,13 +50,6 @@ export function AlertLog() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={triggerMockRfidScan}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-elevated dark:hover:bg-zinc-700 hover:bg-zinc-200 text-secondary text-xs font-mono transition-colors font-medium"
-            >
-              <KeyRound className="w-3.5 h-3.5 text-blue-400" />
-              <span>Simulate RFID</span>
-            </button>
             <button
               onClick={clearLogs}
               title="Clear Logs"

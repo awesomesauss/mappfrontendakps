@@ -76,7 +76,6 @@ interface SmartHomeContextType {
   setHvacTargetTemp: (val: number) => void;
   toggleSmartLock: () => void;
   toggleSecurityArm: () => void;
-  triggerMockRfidScan: () => void;
   toggleMockMode: () => void;
   toggleSimulation: () => void;
   clearLogs: () => void;
@@ -198,11 +197,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       `Perimeter Security System: ${!deviceState.securityArmState ? 'ARMED (HIGH SECURITY)' : 'DISARMED'}`
     );
   }, [deviceState.securityArmState, updateDeviceState]);
-
-  const triggerMockRfidScan = useCallback(() => {
-    const cardId = Math.floor(1000 + Math.random() * 9000).toString(16).toUpperCase();
-    addLog(`RFID Access Granted - Keycard #${cardId} at Front Entrance`, 'success', 'rfid');
-  }, [addLog]);
 
   const toggleMockMode = useCallback(() => {
     setIsMockMode((prev) => !prev);
@@ -449,7 +443,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         setHvacTargetTemp,
         toggleSmartLock,
         toggleSecurityArm,
-        triggerMockRfidScan,
         toggleMockMode,
         toggleSimulation,
         clearLogs,
