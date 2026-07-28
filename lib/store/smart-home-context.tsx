@@ -217,27 +217,63 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setLogs([]);
   }, []);
 
-  // Pull the real device_states row instead of starting from hardcoded defaults
+  // Pull the real device_states row + live-subscribe to cross-client changes
   useEffect(() => {
     if (!supabaseConnected || !supabase || isMockMode) return;
+    const client = supabase;
 
-    supabase
+    const rowToState = (row: {
+      blind: boolean;
+      main_lighting: boolean;
+      lighting_brightness: number;
+      hvac_power: boolean;
+      hvac_target_temp: number;
+      smart_lock: boolean;
+      security_arm_state: boolean;
+    }) => ({
+      blind: row.blind,
+      mainLighting: row.main_lighting,
+      lightingBrightness: row.lighting_brightness,
+      hvacPower: row.hvac_power,
+      hvacTargetTemp: row.hvac_target_temp,
+      smartLock: row.smart_lock,
+      securityArmState: row.security_arm_state,
+    });
+
+    client
       .from('device_states')
       .select('*')
       .eq('id', 1)
       .maybeSingle()
       .then(({ data }) => {
         if (!data) return;
-        setDeviceState({
-          blind: data.blind,
-          mainLighting: data.main_lighting,
-          lightingBrightness: data.lighting_brightness,
-          hvacPower: data.hvac_power,
-          hvacTargetTemp: data.hvac_target_temp,
-          smartLock: data.smart_lock,
-          securityArmState: data.security_arm_state,
-        });
+        setDeviceState(rowToState(data));
       });
+
+    const channel = client
+      .channel('device_states_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'device_states' },
+        (payload) => {
+          if (!payload.new) return;
+          const row = payload.new as {
+            blind: boolean;
+            main_lighting: boolean;
+            lighting_brightness: number;
+            hvac_power: boolean;
+            hvac_target_temp: number;
+            smart_lock: boolean;
+            security_arm_state: boolean;
+          };
+          setDeviceState(rowToState(row));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      client.removeChannel(channel);
+    };
   }, [supabaseConnected, isMockMode]);
 
   // Fetch + live-subscribe to real sensor telemetry from Supabase (STM32 -> relay -> here)
