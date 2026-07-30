@@ -11,6 +11,9 @@ import {
   Flame,
   Sliders,
   SunMedium,
+  Fan,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +24,7 @@ interface SwitchTileProps {
   status: React.ReactNode;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
-  activeColor: 'blue' | 'amber' | 'emerald' | 'purple';
+  activeColor: 'blue' | 'amber' | 'emerald' | 'purple' | 'cyan';
 }
 
 function SwitchTile({
@@ -63,6 +66,9 @@ export function CommandCenter() {
     setLightingBrightness,
     toggleHvacPower,
     setHvacTargetTemp,
+    toggleFanPower,
+    setFanSpeed,
+    toggleDoorLock,
   } = useSmartHome();
 
   return (
@@ -92,17 +98,53 @@ export function CommandCenter() {
           iconClassName={
             deviceState.blind ? 'bg-blue-600/20 text-blue-400' : 'bg-elevated text-muted'
           }
-          label="Door Lock"
+          label="Curtain"
           status={
             <>
               <span className={deviceState.blind ? 'text-blue-400 font-medium' : 'text-dim'}>
-                {deviceState.blind ? 'LOCKED' : 'UNLOCKED'}
+                {deviceState.blind ? 'OPEN' : 'CLOSED'}
               </span>
             </>
           }
           checked={deviceState.blind}
           onCheckedChange={toggleBlind}
           activeColor="blue"
+        />
+
+        <SwitchTile
+          icon={<Fan className="w-3.5 h-3.5" />}
+          iconClassName={
+            deviceState.fanPower ? 'bg-cyan-500/20 text-cyan-400' : 'bg-elevated text-muted'
+          }
+          label="Fan"
+          status={
+            <>
+              <span className={deviceState.fanPower ? 'text-cyan-400 font-medium' : 'text-dim'}>
+                {deviceState.fanPower ? `ON (${deviceState.fanSpeed}%)` : 'OFF'}
+              </span>
+            </>
+          }
+          checked={deviceState.fanPower}
+          onCheckedChange={toggleFanPower}
+          activeColor="cyan"
+        />
+
+        <SwitchTile
+          icon={deviceState.doorLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+          iconClassName={
+            deviceState.doorLocked ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
+          }
+          label="Door Lock"
+          status={
+            <>
+              <span className={deviceState.doorLocked ? 'text-rose-400 font-medium' : 'text-emerald-400 font-medium'}>
+                {deviceState.doorLocked ? 'LOCKED' : 'UNLOCKED'}
+              </span>
+            </>
+          }
+          checked={deviceState.doorLocked}
+          onCheckedChange={toggleDoorLock}
+          activeColor="purple"
         />
 
         <SwitchTile
@@ -145,6 +187,27 @@ export function CommandCenter() {
             value={deviceState.lightingBrightness}
             onChange={(e) => setLightingBrightness(Number(e.target.value))}
             className="w-full h-1 bg-zinc-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-yellow-400 disabled:opacity-30"
+          />
+        </div>
+
+        {/* Fan Speed Slider */}
+        <div className="p-2.5 rounded-xl bg-elevated min-h-[3.25rem] flex flex-col justify-center">
+          <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
+            <span className="text-secondary flex items-center gap-1 font-medium">
+              <Fan className="w-3 h-3 text-cyan-400" />
+              Fan Speed
+            </span>
+            <span className="text-cyan-400 font-semibold">{deviceState.fanSpeed}%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="25"
+            disabled={!deviceState.fanPower}
+            value={deviceState.fanSpeed}
+            onChange={(e) => setFanSpeed(Number(e.target.value))}
+            className="w-full h-1 bg-zinc-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-cyan-400 disabled:opacity-30"
           />
         </div>
 

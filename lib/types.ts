@@ -6,13 +6,16 @@ export interface SensorData {
 }
 
 export interface DeviceState {
-  blind: boolean;      // Open / Closed
+  blind: boolean;          // Curtain/Blind: Open / Closed
   mainLighting: boolean;   // On / Off
   lightingBrightness: number; // 0 - 100%
   hvacPower: boolean;      // On / Off
   hvacTargetTemp: number;  // 16 - 30 °C
-  smartLock: boolean;      // Locked / Unlocked
+  smartLock: boolean;      // Smart Lock (legacy/compat): Locked / Unlocked
   securityArmState: boolean; // Armed / Disarmed
+  fanPower: boolean;       // Fan: On / Off
+  fanSpeed: number;        // Fan: 0 - 100%
+  doorLocked: boolean;     // Door Lock: Locked / Unlocked (separate from smartLock/curtain)
 }
 
 export interface AlertLog {

@@ -76,6 +76,9 @@ interface SmartHomeContextType {
   setHvacTargetTemp: (val: number) => void;
   toggleSmartLock: () => void;
   toggleSecurityArm: () => void;
+  toggleFanPower: () => void;
+  setFanSpeed: (val: number) => void;
+  toggleDoorLock: () => void;
   toggleMockMode: () => void;
   toggleSimulation: () => void;
   clearLogs: () => void;
@@ -96,6 +99,9 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     hvacTargetTemp: 22,
     smartLock: true,
     securityArmState: true,
+    fanPower: false,
+    fanSpeed: 0,
+    doorLocked: true,
   });
 
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>(generateInitialHistory());
@@ -144,6 +150,9 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             hvac_target_temp: next.hvacTargetTemp,
             smart_lock: next.smartLock,
             security_arm_state: next.securityArmState,
+            fan_power: next.fanPower,
+            fan_speed: next.fanSpeed,
+            door_locked: next.doorLocked,
             updated_at: new Date().toISOString(),
           }])
           .then(({ error }) => {
@@ -158,7 +167,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   const toggleBlind = useCallback(() => {
     updateDeviceState(
       (prev) => ({ ...prev, blind: !prev.blind }),
-      `Door Lock: ${!deviceState.blind ? 'LOCKED' : 'UNLOCKED'}`
+      `Curtain/Blind: ${!deviceState.blind ? 'OPEN' : 'CLOSED'}`
     );
   }, [deviceState.blind, updateDeviceState]);
 
@@ -198,6 +207,28 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     );
   }, [deviceState.securityArmState, updateDeviceState]);
 
+  const toggleFanPower = useCallback(() => {
+    updateDeviceState(
+      (prev) => ({ ...prev, fanPower: !prev.fanPower }),
+      `Fan: ${!deviceState.fanPower ? 'ON' : 'OFF'}`
+    );
+  }, [deviceState.fanPower, updateDeviceState]);
+
+  const setFanSpeed = useCallback((val: number) => {
+    const clamped = Math.max(0, Math.min(100, val));
+    updateDeviceState(
+      (prev) => ({ ...prev, fanSpeed: clamped, fanPower: clamped > 0 ? true : prev.fanPower }),
+      `Fan Speed: ${clamped}%`
+    );
+  }, [updateDeviceState]);
+
+  const toggleDoorLock = useCallback(() => {
+    updateDeviceState(
+      (prev) => ({ ...prev, doorLocked: !prev.doorLocked }),
+      `Door Lock: ${!deviceState.doorLocked ? 'LOCKED' : 'UNLOCKED'}`
+    );
+  }, [deviceState.doorLocked, updateDeviceState]);
+
   const toggleMockMode = useCallback(() => {
     setIsMockMode((prev) => !prev);
     addLog(`Switched hardware mode to ${!isMockMode ? 'Mock Simulation' : 'Live Supabase Backend'}`, 'warning', 'system');
@@ -211,13 +242,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setLogs([]);
   }, []);
 
-<<<<<<< HEAD
-  // Pull the real device_states row instead of starting from hardcoded defaults
-  useEffect(() => {
-    if (!supabaseConnected || !supabase || isMockMode) return;
-
-    supabase
-=======
   // Pull the real device_states row + live-subscribe to cross-client changes
   useEffect(() => {
     if (!supabaseConnected || !supabase || isMockMode) return;
@@ -231,6 +255,9 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       hvac_target_temp: number;
       smart_lock: boolean;
       security_arm_state: boolean;
+      fan_power: boolean;
+      fan_speed: number;
+      door_locked: boolean;
     }) => ({
       blind: row.blind,
       mainLighting: row.main_lighting,
@@ -239,28 +266,18 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       hvacTargetTemp: row.hvac_target_temp,
       smartLock: row.smart_lock,
       securityArmState: row.security_arm_state,
+      fanPower: row.fan_power,
+      fanSpeed: row.fan_speed,
+      doorLocked: row.door_locked,
     });
 
     client
->>>>>>> master
       .from('device_states')
       .select('*')
       .eq('id', 1)
       .maybeSingle()
       .then(({ data }) => {
         if (!data) return;
-<<<<<<< HEAD
-        setDeviceState({
-          gateServo: data.gate_servo,
-          mainLighting: data.main_lighting,
-          lightingBrightness: data.lighting_brightness,
-          hvacPower: data.hvac_power,
-          hvacTargetTemp: data.hvac_target_temp,
-          smartLock: data.smart_lock,
-          securityArmState: data.security_arm_state,
-        });
-      });
-=======
         setDeviceState(rowToState(data));
       });
 
@@ -279,6 +296,9 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             hvac_target_temp: number;
             smart_lock: boolean;
             security_arm_state: boolean;
+            fan_power: boolean;
+            fan_speed: number;
+            door_locked: boolean;
           };
           setDeviceState(rowToState(row));
         }
@@ -288,7 +308,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     return () => {
       client.removeChannel(channel);
     };
->>>>>>> master
   }, [supabaseConnected, isMockMode]);
 
   // Fetch + live-subscribe to real sensor telemetry from Supabase (STM32 -> relay -> here)
@@ -464,6 +483,9 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         setHvacTargetTemp,
         toggleSmartLock,
         toggleSecurityArm,
+        toggleFanPower,
+        setFanSpeed,
+        toggleDoorLock,
         toggleMockMode,
         toggleSimulation,
         clearLogs,
