@@ -147,7 +147,7 @@ export function LiveChart({ data }: LiveChartProps) {
   }, []);
 
   return (
-    <GlassCard glowColor="cyan" className="col-span-1 lg:col-span-3 flex flex-col h-full">
+    <GlassCard glowColor="cyan" className="col-span-1 lg:col-span-3 flex flex-col">
       <div className="flex items-center gap-2.5 mb-4">
         <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
           <Activity className="w-4 h-4" />
@@ -160,8 +160,8 @@ export function LiveChart({ data }: LiveChartProps) {
         </div>
       </div>
 
-      <div className="relative flex-1 min-h-0">
-        <div className="w-full h-full">
+      <div className="relative">
+        <div className="h-60 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
