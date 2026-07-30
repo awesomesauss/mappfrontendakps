@@ -5,6 +5,7 @@ import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-mot
 import { TextReveal } from '@/components/ui/text-reveal';
 import { TextScramble } from '@/components/ui/text-scramble';
 import { ArrowRight } from 'lucide-react';
+import { useTheme } from '@/lib/store/theme-context';
 
 interface WelcomeScreenProps {
   onEnterDashboard: () => void;
@@ -16,7 +17,7 @@ function StarIcon() {
     <motion.span
       animate={{ rotate: 360 }}
       transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-      className="inline-flex items-center justify-center text-white mx-1 align-middle"
+      className="inline-flex items-center justify-center text-app mx-1 align-middle"
       style={{ display: 'inline-block', verticalAlign: 'middle' }}
     >
       <svg
@@ -37,6 +38,7 @@ function StarIcon() {
 
 export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
   const [mounted, setMounted] = useState(false);
+  const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const mouseX = useMotionValue(0);
@@ -45,8 +47,8 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
   const springX = useSpring(mouseX, { stiffness: 120, damping: 30, mass: 0.5 });
   const springY = useSpring(mouseY, { stiffness: 120, damping: 30, mass: 0.5 });
 
-  const spotlightBg = useMotionTemplate`radial-gradient(600px circle at ${springX}px ${springY}px, rgba(200, 210, 255, 0.15) 0%, transparent 70%)`;
-  const spotlightGlow = useMotionTemplate`radial-gradient(900px circle at ${springX}px ${springY}px, rgba(120, 140, 255, 0.1) 0%, transparent 65%)`;
+  const spotlightBg = useMotionTemplate`radial-gradient(600px circle at ${springX}px ${springY}px, ${isDark ? 'rgba(200, 210, 255, 0.15)' : 'rgba(59, 130, 246, 0.08)'} 0%, transparent 70%)`;
+  const spotlightGlow = useMotionTemplate`radial-gradient(900px circle at ${springX}px ${springY}px, ${isDark ? 'rgba(120, 140, 255, 0.1)' : 'rgba(59, 130, 246, 0.04)'} 0%, transparent 65%)`;
 
   useEffect(() => {
     setMounted(true);
@@ -79,10 +81,10 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen bg-black text-slate-100 flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden"
+      className="relative min-h-screen bg-app text-app flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden"
     >
       {/* Dot grid — bottom layer */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:32px_32px] opacity-25" />
+      <div className="pointer-events-none absolute inset-0 z-0 dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] bg-[radial-gradient(#d4d4d8_1px,transparent_1px)] [background-size:32px_32px] opacity-25" />
 
       {/* Cursor spotlight — reactive via useMotionTemplate */}
       {mounted && (
@@ -101,8 +103,8 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
       {/* Main Hero — above spotlight */}
       <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
 
-        {/* Headline with inline white star */}
-        <div className="font-vt323 tracking-wider text-center uppercase leading-none font-normal scanline-text select-none">
+        {/* Headline */}
+        <div className="font-vt323 tracking-wider text-center uppercase leading-none font-normal select-none">
 
           {/* Line 1 */}
           <div className="text-5xl sm:text-6xl lg:text-7xl">
@@ -111,7 +113,7 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
             </TextReveal>
           </div>
 
-          {/* Line 2 — star inline between words */}
+          {/* Line 2 — star to the right */}
           <div className="text-5xl sm:text-6xl lg:text-7xl flex items-center justify-center flex-wrap gap-x-3 gap-y-0 my-0.5">
             <motion.span
               initial={{ opacity: 0, y: 20, filter: 'blur(12px)' }}
@@ -120,7 +122,6 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
             >
               to control
             </motion.span>
-            {mounted && <StarIcon />}
             <motion.span
               initial={{ opacity: 0, y: 20, filter: 'blur(12px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -128,10 +129,11 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
             >
               your home
             </motion.span>
+            {mounted && <StarIcon />}
           </div>
 
           {/* Line 3 — dimmer */}
-          <div className="text-4xl sm:text-5xl lg:text-6xl text-zinc-400">
+          <div className="text-4xl sm:text-5xl lg:text-6xl text-muted">
             <TextReveal per="word" preset="fade-in-blur" delay={0.3} speedReveal={1.2}>
               in real time
             </TextReveal>
@@ -144,7 +146,7 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
             as="div"
             duration={1.2}
             speed={0.02}
-            className="text-sm sm:text-base font-mono text-zinc-400 text-center leading-relaxed"
+            className="text-sm sm:text-base font-mono text-muted text-center leading-relaxed"
           >
             Built-in UI, real-time telemetry, hardware state control, security event logs, memory, and observability.
           </TextScramble>
@@ -158,10 +160,10 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
         >
           <button
             onClick={onEnterDashboard}
-            className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-zinc-100 hover:bg-white text-black font-mono text-sm font-bold tracking-wide transition-all shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95"
+            className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full dark:bg-zinc-100 dark:hover:bg-white dark:text-black bg-zinc-800 hover:bg-zinc-700 text-white font-mono text-sm font-bold tracking-wide transition-all shadow-xl dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(0,0,0,0.1)] hover:scale-105 active:scale-95"
           >
             <span>Enter Command Center</span>
-            <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 dark:text-black text-white group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
 

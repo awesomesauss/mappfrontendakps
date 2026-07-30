@@ -1,4 +1,4 @@
--- Aurora Smart Home Command Center Supabase Database Schema
+-- ASS (Automatic Solar System) Command Center Supabase Database Schema
 -- Run this SQL in your Supabase SQL Editor to connect real STM32 / ESP-01 hardware
 
 -- 1. Create Telemetry Table for Environmental Sensors
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS sensor_telemetry (
 -- 2. Create Device States Table for Control Center (Gate, Lighting, Lock, HVAC)
 CREATE TABLE IF NOT EXISTS device_states (
   id INT PRIMARY KEY DEFAULT 1,
-  gate_servo BOOLEAN DEFAULT FALSE,
+  blind BOOLEAN DEFAULT FALSE,
   main_lighting BOOLEAN DEFAULT TRUE,
   lighting_brightness INT DEFAULT 80,
   hvac_power BOOLEAN DEFAULT TRUE,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS alert_logs (
 );
 
 -- Seed initial device state row
-INSERT INTO device_states (id, gate_servo, main_lighting, lighting_brightness, hvac_power, hvac_target_temp, smart_lock, security_arm_state)
+INSERT INTO device_states (id, blind, main_lighting, lighting_brightness, hvac_power, hvac_target_temp, smart_lock, security_arm_state)
 VALUES (1, FALSE, TRUE, 80, TRUE, 22, TRUE, TRUE)
 ON CONFLICT (id) DO NOTHING;
 

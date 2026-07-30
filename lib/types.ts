@@ -6,7 +6,7 @@ export interface SensorData {
 }
 
 export interface DeviceState {
-  gateServo: boolean;      // Open / Closed
+  blind: boolean;      // Open / Closed
   mainLighting: boolean;   // On / Off
   lightingBrightness: number; // 0 - 100%
   hvacPower: boolean;      // On / Off

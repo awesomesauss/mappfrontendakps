@@ -22,9 +22,9 @@ export function Switch({
   activeColor = 'blue',
 }: SwitchProps) {
   const sizeMap = {
-    sm: { track: 'w-8 h-4.5 p-0.5', thumb: 'w-3.5 h-3.5', translate: '14px' },
-    md: { track: 'w-11 h-6 p-0.5', thumb: 'w-5 h-5', translate: '20px' },
-    lg: { track: 'w-13 h-7 p-0.5', thumb: 'w-6 h-6', translate: '24px' },
+    sm: { track: 'w-8 h-4.5 p-0.5', thumb: 'w-3.5 h-3.5', translate: 14 },
+    md: { track: 'w-11 h-6 p-0.5', thumb: 'w-5 h-5', translate: 20 },
+    lg: { track: 'w-13 h-7 p-0.5', thumb: 'w-6 h-6', translate: 24 },
   };
 
   const activeColorClasses = {
@@ -52,14 +52,12 @@ export function Switch({
     >
       <motion.span
         layout
+        animate={{ x: checked ? sizeMap[size].translate : 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         className={cn(
           'pointer-events-none inline-block rounded-full bg-white shadow-sm ring-0',
           sizeMap[size].thumb
         )}
-        style={{
-          transform: checked ? `translateX(${sizeMap[size].translate})` : 'translateX(0px)',
-        }}
       />
     </button>
   );

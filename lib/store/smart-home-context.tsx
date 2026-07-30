@@ -41,7 +41,7 @@ const initialLogs: AlertLog[] = [
     id: '2',
     timestamp: new Date(Date.now() - 15 * 60 * 1000).toLocaleTimeString([], { hour12: false }),
     level: 'info',
-    message: 'Gate Servo closed automatically via auto-timer',
+    message: 'Blind closed automatically via auto-timer',
     category: 'control',
   },
   {
@@ -69,14 +69,13 @@ interface SmartHomeContextType {
   isMockMode: boolean;
   isSimulating: boolean;
   supabaseConnected: boolean;
-  toggleGateServo: () => void;
+  toggleBlind: () => void;
   toggleMainLighting: () => void;
   setLightingBrightness: (val: number) => void;
   toggleHvacPower: () => void;
   setHvacTargetTemp: (val: number) => void;
   toggleSmartLock: () => void;
   toggleSecurityArm: () => void;
-  triggerMockRfidScan: () => void;
   toggleMockMode: () => void;
   toggleSimulation: () => void;
   clearLogs: () => void;
@@ -90,7 +89,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   const [supabaseConnected] = useState<boolean>(isSupabaseConfigured);
 
   const [deviceState, setDeviceState] = useState<DeviceState>({
-    gateServo: false,
+    blind: false,
     mainLighting: true,
     lightingBrightness: 80,
     hvacPower: true,
@@ -131,19 +130,37 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setDeviceState((prev) => {
       const next = updater(prev);
       if (supabaseConnected && supabase && !isMockMode) {
-        supabase.from('device_states').upsert([{ id: 1, ...next, updated_at: new Date().toISOString() }]).then();
+        // device_states columns are snake_case; DeviceState is camelCase, so map explicitly
+        // instead of spreading -- a raw spread sends camelCase keys PostgREST doesn't
+        // recognize and the upsert is rejected outright (silently, since there's no .catch()).
+        supabase
+          .from('device_states')
+          .upsert([{
+            id: 1,
+            blind: next.blind,
+            main_lighting: next.mainLighting,
+            lighting_brightness: next.lightingBrightness,
+            hvac_power: next.hvacPower,
+            hvac_target_temp: next.hvacTargetTemp,
+            smart_lock: next.smartLock,
+            security_arm_state: next.securityArmState,
+            updated_at: new Date().toISOString(),
+          }])
+          .then(({ error }) => {
+            if (error) console.error('[Supabase] device_states upsert failed:', error);
+          });
       }
       return next;
     });
     addLog(actionDescription, 'info', 'control');
   }, [supabaseConnected, isMockMode, addLog]);
 
-  const toggleGateServo = useCallback(() => {
+  const toggleBlind = useCallback(() => {
     updateDeviceState(
-      (prev) => ({ ...prev, gateServo: !prev.gateServo }),
-      `Gate Servo command executed: ${!deviceState.gateServo ? 'OPENED' : 'CLOSED'}`
+      (prev) => ({ ...prev, blind: !prev.blind }),
+      `Door Lock: ${!deviceState.blind ? 'LOCKED' : 'UNLOCKED'}`
     );
-  }, [deviceState.gateServo, updateDeviceState]);
+  }, [deviceState.blind, updateDeviceState]);
 
   const toggleMainLighting = useCallback(() => {
     updateDeviceState(
@@ -181,11 +198,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     );
   }, [deviceState.securityArmState, updateDeviceState]);
 
-  const triggerMockRfidScan = useCallback(() => {
-    const cardId = Math.floor(1000 + Math.random() * 9000).toString(16).toUpperCase();
-    addLog(`RFID Access Granted - Keycard #${cardId} at Front Entrance`, 'success', 'rfid');
-  }, [addLog]);
-
   const toggleMockMode = useCallback(() => {
     setIsMockMode((prev) => !prev);
     addLog(`Switched hardware mode to ${!isMockMode ? 'Mock Simulation' : 'Live Supabase Backend'}`, 'warning', 'system');
@@ -199,17 +211,45 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setLogs([]);
   }, []);
 
+<<<<<<< HEAD
   // Pull the real device_states row instead of starting from hardcoded defaults
   useEffect(() => {
     if (!supabaseConnected || !supabase || isMockMode) return;
 
     supabase
+=======
+  // Pull the real device_states row + live-subscribe to cross-client changes
+  useEffect(() => {
+    if (!supabaseConnected || !supabase || isMockMode) return;
+    const client = supabase;
+
+    const rowToState = (row: {
+      blind: boolean;
+      main_lighting: boolean;
+      lighting_brightness: number;
+      hvac_power: boolean;
+      hvac_target_temp: number;
+      smart_lock: boolean;
+      security_arm_state: boolean;
+    }) => ({
+      blind: row.blind,
+      mainLighting: row.main_lighting,
+      lightingBrightness: row.lighting_brightness,
+      hvacPower: row.hvac_power,
+      hvacTargetTemp: row.hvac_target_temp,
+      smartLock: row.smart_lock,
+      securityArmState: row.security_arm_state,
+    });
+
+    client
+>>>>>>> master
       .from('device_states')
       .select('*')
       .eq('id', 1)
       .maybeSingle()
       .then(({ data }) => {
         if (!data) return;
+<<<<<<< HEAD
         setDeviceState({
           gateServo: data.gate_servo,
           mainLighting: data.main_lighting,
@@ -220,6 +260,35 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
           securityArmState: data.security_arm_state,
         });
       });
+=======
+        setDeviceState(rowToState(data));
+      });
+
+    const channel = client
+      .channel('device_states_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'device_states' },
+        (payload) => {
+          if (!payload.new) return;
+          const row = payload.new as {
+            blind: boolean;
+            main_lighting: boolean;
+            lighting_brightness: number;
+            hvac_power: boolean;
+            hvac_target_temp: number;
+            smart_lock: boolean;
+            security_arm_state: boolean;
+          };
+          setDeviceState(rowToState(row));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      client.removeChannel(channel);
+    };
+>>>>>>> master
   }, [supabaseConnected, isMockMode]);
 
   // Fetch + live-subscribe to real sensor telemetry from Supabase (STM32 -> relay -> here)
@@ -388,14 +457,13 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         isMockMode,
         isSimulating,
         supabaseConnected,
-        toggleGateServo,
+        toggleBlind,
         toggleMainLighting,
         setLightingBrightness,
         toggleHvacPower,
         setHvacTargetTemp,
         toggleSmartLock,
         toggleSecurityArm,
-        triggerMockRfidScan,
         toggleMockMode,
         toggleSimulation,
         clearLogs,

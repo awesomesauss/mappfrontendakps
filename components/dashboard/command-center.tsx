@@ -8,14 +8,9 @@ import {
   DoorClosed,
   DoorOpen,
   Lightbulb,
-  Lock,
-  Unlock,
-  ShieldCheck,
-  ShieldAlert,
   Flame,
   Sliders,
   SunMedium,
-  CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -39,14 +34,14 @@ function SwitchTile({
   activeColor,
 }: SwitchTileProps) {
   return (
-    <div className="min-h-[3.25rem] p-2.5 rounded-xl bg-zinc-950/50 flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2 min-w-0 flex-1">
+    <div className="min-h-[3.25rem] p-2.5 rounded-xl bg-elevated flex items-start justify-between gap-2">
+      <div className="flex items-center gap-2 min-w-0 flex-1 pt-0.5">
         <div className={cn('p-1.5 rounded-md shrink-0 transition-colors', iconClassName)}>
           {icon}
         </div>
         <div className="min-w-0">
-          <div className="text-[11px] font-semibold text-zinc-200 font-mono truncate">{label}</div>
-          <div className="text-[10px] font-mono text-zinc-400 truncate">{status}</div>
+          <div className="text-[11px] font-semibold text-secondary font-mono truncate leading-tight">{label}</div>
+          <div className="text-[10px] font-mono text-muted truncate leading-tight">{status}</div>
         </div>
       </div>
       <Switch
@@ -63,70 +58,63 @@ function SwitchTile({
 export function CommandCenter() {
   const {
     deviceState,
-    toggleGateServo,
+    toggleBlind,
     toggleMainLighting,
     setLightingBrightness,
     toggleHvacPower,
     setHvacTargetTemp,
-    toggleSmartLock,
-    toggleSecurityArm,
   } = useSmartHome();
 
   return (
     <GlassCard glowColor="blue" className="col-span-1 lg:col-span-1 flex flex-col gap-3">
       {/* Header */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 mb-4">
         <div className="flex items-center gap-2">
           <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 shrink-0">
             <Sliders className="w-3.5 h-3.5" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-xs font-semibold text-zinc-100 font-mono leading-tight">
+            <h3 className="text-xs font-semibold text-app font-mono leading-tight">
               Command Center
             </h3>
-            <p className="text-[10px] text-zinc-400 font-mono leading-tight">
+            <p className="text-[10px] text-muted font-mono leading-tight">
               GPIO &amp; actuator control
             </p>
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-zinc-800/60 text-zinc-300 text-[10px] font-mono">
-          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-          <span>Pin Bus Online</span>
-        </div>
       </div>
 
       {/* Switch Stack — single column for narrow panel */}
       <div className="grid grid-cols-1 gap-2 flex-1">
         <SwitchTile
-          icon={deviceState.gateServo ? <DoorOpen className="w-3.5 h-3.5" /> : <DoorClosed className="w-3.5 h-3.5" />}
+          icon={deviceState.blind ? <DoorOpen className="w-3.5 h-3.5" /> : <DoorClosed className="w-3.5 h-3.5" />}
           iconClassName={
-            deviceState.gateServo ? 'bg-blue-600/20 text-blue-400' : 'bg-zinc-800/80 text-zinc-400'
+            deviceState.blind ? 'bg-blue-600/20 text-blue-400' : 'bg-elevated text-muted'
           }
-          label="Gate Servo"
+          label="Door Lock"
           status={
             <>
-              Position:{' '}
-              <span className={deviceState.gateServo ? 'text-blue-400 font-medium' : 'text-zinc-500'}>
-                {deviceState.gateServo ? 'OPEN (90°)' : 'CLOSED (0°)'}
+              <span className={deviceState.blind ? 'text-blue-400 font-medium' : 'text-dim'}>
+                {deviceState.blind ? 'LOCKED' : 'UNLOCKED'}
               </span>
             </>
           }
-          checked={deviceState.gateServo}
-          onCheckedChange={toggleGateServo}
+          checked={deviceState.blind}
+          onCheckedChange={toggleBlind}
           activeColor="blue"
         />
 
         <SwitchTile
           icon={<Lightbulb className="w-3.5 h-3.5" />}
           iconClassName={
-            deviceState.mainLighting ? 'bg-amber-500/20 text-amber-400' : 'bg-zinc-800/80 text-zinc-400'
+            deviceState.mainLighting ? 'bg-amber-500/20 text-amber-400' : 'bg-elevated text-muted'
           }
-          label="Main Lighting"
+          label="Lights"
           status={
             <>
               Power:{' '}
-              <span className={deviceState.mainLighting ? 'text-amber-400 font-medium' : 'text-zinc-500'}>
+              <span className={deviceState.mainLighting ? 'text-amber-400 font-medium' : 'text-dim'}>
                 {deviceState.mainLighting ? `ON (${deviceState.lightingBrightness}%)` : 'OFF'}
               </span>
             </>
@@ -136,63 +124,18 @@ export function CommandCenter() {
           activeColor="amber"
         />
 
-        <SwitchTile
-          icon={deviceState.smartLock ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-          iconClassName={
-            deviceState.smartLock ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800/80 text-zinc-400'
-          }
-          label="Smart Lock"
-          status={
-            <>
-              Relay:{' '}
-              <span className={deviceState.smartLock ? 'text-emerald-400 font-medium' : 'text-amber-400'}>
-                {deviceState.smartLock ? 'LOCKED' : 'UNLOCKED'}
-              </span>
-            </>
-          }
-          checked={deviceState.smartLock}
-          onCheckedChange={toggleSmartLock}
-          activeColor="emerald"
-        />
-
-        <SwitchTile
-          icon={
-            deviceState.securityArmState ? (
-              <ShieldCheck className="w-3.5 h-3.5" />
-            ) : (
-              <ShieldAlert className="w-3.5 h-3.5" />
-            )
-          }
-          iconClassName={
-            deviceState.securityArmState
-              ? 'bg-purple-500/20 text-purple-400'
-              : 'bg-zinc-800/80 text-zinc-400'
-          }
-          label="Perimeter Guard"
-          status={
-            <>
-              Mode:{' '}
-              <span className={deviceState.securityArmState ? 'text-purple-400 font-medium' : 'text-zinc-500'}>
-                {deviceState.securityArmState ? 'ARMED' : 'DISARMED'}
-              </span>
-            </>
-          }
-          checked={deviceState.securityArmState}
-          onCheckedChange={toggleSecurityArm}
-          activeColor="purple"
-        />
       </div>
 
       {/* Auxiliary Controls — stacked for narrow column */}
-      <div className="pt-2.5 border-t border-zinc-800/40 grid grid-cols-1 gap-2">
+      <div className="pt-2.5 border-t border-app grid grid-cols-1 gap-2">
         {/* Dimmer Slider */}
-        <div className="p-2.5 rounded-xl bg-zinc-950/40 min-h-[3.25rem] flex flex-col justify-center">
+        <div className="p-2.5 rounded-xl bg-elevated min-h-[3.25rem] flex flex-col justify-center">
           <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
-            <span className="text-zinc-300 flex items-center gap-1 font-medium">
-              <SunMedium className="w-3 h-3 text-amber-400" />
-              Main Lumens
+            <span className="text-secondary flex items-center gap-1 font-medium">
+              <SunMedium className="w-3 h-3 text-yellow-400" />
+              Brightness
             </span>
-            <span className="text-amber-400 font-semibold">{deviceState.lightingBrightness}%</span>
+            <span className="text-yellow-400 font-semibold">{deviceState.lightingBrightness}%</span>
           </div>
           <input
             type="range"
@@ -201,12 +144,12 @@ export function CommandCenter() {
             disabled={!deviceState.mainLighting}
             value={deviceState.lightingBrightness}
             onChange={(e) => setLightingBrightness(Number(e.target.value))}
-            className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-amber-500 disabled:opacity-30"
+            className="w-full h-1 bg-zinc-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-yellow-400 disabled:opacity-30"
           />
         </div>
 
         {/* HVAC Controller */}
-        <div className="p-2.5 rounded-xl bg-zinc-950/40 min-h-[3.25rem] flex items-center justify-between gap-2">
+        <div className="p-2.5 rounded-xl bg-elevated min-h-[3.25rem] flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
             <button
               onClick={toggleHvacPower}
@@ -214,14 +157,14 @@ export function CommandCenter() {
                 'p-1.5 rounded-md text-xs font-mono transition-all shrink-0',
                 deviceState.hvacPower
                   ? 'bg-rose-500/20 text-rose-400 font-semibold'
-                  : 'bg-zinc-800 text-zinc-500'
+                  : 'bg-elevated text-dim'
               )}
             >
               <Flame className="w-3 h-3" />
             </button>
             <div className="min-w-0">
-              <div className="text-[10px] font-mono text-zinc-200 font-medium leading-tight">HVAC Target</div>
-              <div className="text-[9px] font-mono text-zinc-400 leading-tight">
+              <div className="text-[10px] font-mono text-secondary font-medium leading-tight">AC Temp</div>
+              <div className="text-[9px] font-mono text-muted leading-tight">
                 {deviceState.hvacPower ? 'Active' : 'Standby'}
               </div>
             </div>
@@ -230,16 +173,16 @@ export function CommandCenter() {
           <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => setHvacTargetTemp(Math.max(16, deviceState.hvacTargetTemp - 1))}
-              className="w-6 h-6 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold font-mono text-[10px] flex items-center justify-center"
+              className="w-6 h-6 rounded-md bg-elevated dark:hover:bg-zinc-700 hover:bg-zinc-200 text-secondary font-bold font-mono text-[10px] flex items-center justify-center"
             >
               -
             </button>
-            <span className="text-[10px] font-bold font-mono text-zinc-100 w-7 text-center">
+            <span className="text-[10px] font-bold font-mono text-app w-7 text-center">
               {deviceState.hvacTargetTemp}°C
             </span>
             <button
               onClick={() => setHvacTargetTemp(Math.min(30, deviceState.hvacTargetTemp + 1))}
-              className="w-6 h-6 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold font-mono text-[10px] flex items-center justify-center"
+              className="w-6 h-6 rounded-md bg-elevated dark:hover:bg-zinc-700 hover:bg-zinc-200 text-secondary font-bold font-mono text-[10px] flex items-center justify-center"
             >
               +
             </button>

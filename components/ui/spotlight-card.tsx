@@ -39,7 +39,7 @@ export function SpotlightCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        'relative rounded-3xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-2xl p-6 shadow-2xl overflow-hidden transition-all duration-300 hover:border-zinc-700/80 group',
+        'relative rounded-3xl border border-app bg-card backdrop-blur-2xl p-6 shadow-2xl overflow-hidden transition-all duration-300 dark:hover:border-zinc-700/80 hover:border-zinc-300 group',
         className
       )}
       {...props}
