@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS device_states (
   hvac_target_temp INT DEFAULT 22,
   smart_lock BOOLEAN DEFAULT TRUE,
   security_arm_state BOOLEAN DEFAULT TRUE,
+  fan_power BOOLEAN DEFAULT FALSE,
+  fan_speed INT DEFAULT 100,
+  door_locked BOOLEAN DEFAULT TRUE,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
