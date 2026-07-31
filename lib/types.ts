@@ -9,8 +9,6 @@ export interface DeviceState {
   blind: boolean;          // Curtain/Blind: Open / Closed
   mainLighting: boolean;   // On / Off
   lightingBrightness: number; // 0 - 100%
-  hvacPower: boolean;      // On / Off
-  hvacTargetTemp: number;  // 16 - 30 °C
   smartLock: boolean;      // Smart Lock (legacy/compat): Locked / Unlocked
   securityArmState: boolean; // Armed / Disarmed
   fanPower: boolean;       // Fan: On / Off

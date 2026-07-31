@@ -27,7 +27,7 @@ function CustomTooltip({ active, payload, label }: any) {
       { label: 'Power', value: payload[2]?.value, unit: 'kW', color: 'text-amber-400' },
     ];
     return (
-      <div className="rounded-xl bg-card border border-app p-3 shadow-xl font-mono text-xs space-y-1">
+      <div className="rounded-xl bg-card border border-app p-3 shadow-xl text-xs space-y-1">
         <p className="text-dim flex items-center gap-1 pb-1.5 border-b border-app">
           <Clock className="w-3 h-3 text-blue-400" />
           <span>{label}</span>
@@ -147,21 +147,21 @@ export function LiveChart({ data }: LiveChartProps) {
   }, []);
 
   return (
-    <GlassCard glowColor="cyan" className="col-span-1 lg:col-span-3 flex flex-col">
+    <GlassCard glowColor="cyan" className="col-span-1 lg:col-span-3 flex flex-col min-h-[420px]">
       <div className="flex items-center gap-2.5 mb-4">
         <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
           <Activity className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-app font-mono">
+          <h3 className="text-sm font-semibold text-app">
             Environmental Telemetry Stream
           </h3>
-          <p className="text-[11px] text-muted font-mono">Tap any point for a full snapshot</p>
+          <p className="text-[11px] text-muted">Tap any point for a full snapshot</p>
         </div>
       </div>
 
       <div className="relative">
-        <div className="h-60 w-full">
+        <div className="h-64 sm:h-72 lg:h-80 xl:h-96 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
@@ -194,7 +194,6 @@ export function LiveChart({ data }: LiveChartProps) {
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
-                fontFamily="monospace"
               />
               <YAxis
                 yAxisId="left"
@@ -202,7 +201,6 @@ export function LiveChart({ data }: LiveChartProps) {
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
-                fontFamily="monospace"
               />
               <YAxis
                 yAxisId="right"
@@ -211,7 +209,6 @@ export function LiveChart({ data }: LiveChartProps) {
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
-                fontFamily="monospace"
               />
 
               <Tooltip content={<CustomTooltip />} />
@@ -259,7 +256,7 @@ export function LiveChart({ data }: LiveChartProps) {
         </AnimatePresence>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-app flex items-center text-xs text-muted font-mono">
+      <div className="mt-4 pt-3 border-t border-app flex items-center text-xs text-muted">
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
           <span className="text-secondary font-medium">Socket Streaming</span>

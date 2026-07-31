@@ -10,14 +10,12 @@ CREATE TABLE IF NOT EXISTS sensor_telemetry (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Create Device States Table for Control Center (Gate, Lighting, Lock, HVAC)
+-- 2. Create Device States Table for Control Center (Gate, Lighting, Lock)
 CREATE TABLE IF NOT EXISTS device_states (
   id INT PRIMARY KEY DEFAULT 1,
   blind BOOLEAN DEFAULT FALSE,
   main_lighting BOOLEAN DEFAULT TRUE,
   lighting_brightness INT DEFAULT 80,
-  hvac_power BOOLEAN DEFAULT TRUE,
-  hvac_target_temp INT DEFAULT 22,
   smart_lock BOOLEAN DEFAULT TRUE,
   security_arm_state BOOLEAN DEFAULT TRUE,
   fan_power BOOLEAN DEFAULT FALSE,
@@ -36,8 +34,8 @@ CREATE TABLE IF NOT EXISTS alert_logs (
 );
 
 -- Seed initial device state row
-INSERT INTO device_states (id, blind, main_lighting, lighting_brightness, hvac_power, hvac_target_temp, smart_lock, security_arm_state)
-VALUES (1, FALSE, TRUE, 80, TRUE, 22, TRUE, TRUE)
+INSERT INTO device_states (id, blind, main_lighting, lighting_brightness, smart_lock, security_arm_state, fan_power, fan_speed, door_locked)
+VALUES (1, FALSE, TRUE, 80, TRUE, TRUE, FALSE, 100, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 -- Enable Realtime publication for tables so Next.js receives instant updates

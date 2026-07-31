@@ -43,9 +43,9 @@ export function BentoGrid() {
       </div>
 
       {/* Main Core Controls & Telemetry Graph Grid — 3:1 split on large screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
-        <LiveChart data={telemetryHistory} />
-        <CommandCenter />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+              <LiveChart data={telemetryHistory} />
+              <CommandCenter />
       </div>
 
       {/* Bottom Event Log & Access Security Grid */}

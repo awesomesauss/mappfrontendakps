@@ -44,8 +44,8 @@ export function AlertLog() {
               <Bell className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-app font-mono">Hardware Event Feed</h3>
-              <p className="text-[11px] text-muted font-mono">Real-time system interrupts & logs</p>
+              <h3 className="text-sm font-semibold text-app">Hardware Event Feed</h3>
+              <p className="text-[11px] text-muted">Real-time system interrupts & logs</p>
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export function AlertLog() {
         </div>
 
         {/* Category Filters */}
-        <div className="flex items-center gap-1 bg-elevated p-1 rounded-xl mb-3 font-mono text-xs">
+        <div className="flex items-center gap-1 bg-elevated p-1 rounded-xl mb-3 text-xs">
           {(['all', 'rfid', 'sensor', 'control'] as const).map((cat) => (
             <button
               key={cat}
@@ -80,7 +80,7 @@ export function AlertLog() {
       </div>
 
       {/* Log Feed List */}
-      <div className="max-h-64 min-h-48 overflow-y-auto pr-1 space-y-2 font-mono text-xs">
+      <div className="max-h-64 min-h-48 overflow-y-auto pr-1 space-y-2 text-xs">
         <AnimatePresence initial={false}>
           {filteredLogs.length === 0 ? (
             <div className="py-8 text-center text-dim">
@@ -119,7 +119,7 @@ export function AlertLog() {
       </div>
 
       {/* Footer info */}
-      <div className="mt-3 pt-3 border-t border-app flex items-center justify-between text-[11px] font-mono text-dim">
+      <div className="mt-3 pt-3 border-t border-app flex items-center justify-between text-[11px] text-dim">
         <div className="flex items-center gap-1.5">
           <Radio className="w-3 h-3 text-blue-400" />
           <span>UART / WebSockets Active</span>

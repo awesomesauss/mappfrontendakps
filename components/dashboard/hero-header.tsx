@@ -42,15 +42,15 @@ export function HeroHeader() {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-app font-sans">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-app">
                 Automatic Solar System (ASS)
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium font-mono">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Live System
               </span>
             </div>
-            <p className="text-xs text-muted font-mono">
+            <p className="text-xs text-muted">
               Hardware Control Center & Sensor Telemetry
             </p>
           </div>
@@ -68,7 +68,7 @@ export function HeroHeader() {
           </button>
 
           {/* System Clock */}
-          <div className="px-3.5 py-2 rounded-xl bg-elevated text-right font-mono text-xs">
+          <div className="px-3.5 py-2 rounded-xl bg-elevated text-right text-xs">
             <div className="text-[10px] text-dim uppercase tracking-wider flex items-center gap-1 justify-end">
               <Radio className="w-3 h-3 text-blue-400" />
               Time
@@ -81,7 +81,7 @@ export function HeroHeader() {
           {/* Mode Switcher Button */}
           <button
             onClick={toggleMockMode}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-elevated hover:bg-zinc-300 dark:hover:bg-zinc-700 text-secondary text-xs font-mono transition-colors font-medium"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-elevated hover:bg-zinc-300 dark:hover:bg-zinc-700 text-secondary text-xs transition-colors font-medium"
           >
             <Database className="w-3.5 h-3.5 text-blue-400" />
             <span>{isMockMode ? 'Mock Hardware Mode' : 'Supabase Backend'}</span>
@@ -90,7 +90,7 @@ export function HeroHeader() {
           {/* Simulation Stream Button */}
           <button
             onClick={toggleSimulation}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-elevated hover:bg-zinc-300 dark:hover:bg-zinc-700 text-secondary text-xs font-mono transition-colors font-medium"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-elevated hover:bg-zinc-300 dark:hover:bg-zinc-700 text-secondary text-xs transition-colors font-medium"
           >
             <Activity className="w-3.5 h-3.5 text-emerald-400" />
             <span>{isSimulating ? 'Pause Telemetry' : 'Resume Telemetry'}</span>

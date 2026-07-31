@@ -56,9 +56,9 @@ export function WeatherWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-cyan-400" />
-          <span className="text-sm font-semibold text-app font-mono">{weather.city}</span>
+          <span className="text-sm font-semibold text-app">{weather.city}</span>
           {weather.isMock && (
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-elevated text-muted">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-muted">
               MOCK API
             </span>
           )}
@@ -66,7 +66,7 @@ export function WeatherWidget() {
         <button
           onClick={fetchWeather}
           disabled={loading}
-          className="p-1.5 rounded-lg bg-elevated dark:hover:bg-white/10 hover:bg-zinc-200/50 text-muted hover:text-app transition-all"
+          className="p-1.5 rounded-lg bg-elevated dark:hover:bg-zinc-700 hover:bg-zinc-200 text-muted hover:text-app transition-all"
         >
           <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
         </button>
@@ -75,10 +75,10 @@ export function WeatherWidget() {
       {/* Main Condition Display */}
       <div className="my-4 flex items-center justify-between">
         <div>
-          <div className="text-4xl font-extrabold text-app font-mono tracking-tight">
+          <div className="text-4xl font-extrabold text-app tracking-tight">
             {weather.temp}°C
           </div>
-          <p className="text-xs text-secondary font-medium font-mono mt-0.5">{weather.condition}</p>
+          <p className="text-xs text-secondary font-medium mt-0.5">{weather.condition}</p>
         </div>
 
         <div className="p-3 rounded-2xl bg-elevated backdrop-blur-md">
@@ -87,7 +87,7 @@ export function WeatherWidget() {
       </div>
 
       {/* Weather Stats Grid */}
-      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-app font-mono text-xs">
+      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-app text-xs">
         <div className="flex items-center gap-2 p-2 rounded-xl bg-elevated">
           <Droplets className="w-4 h-4 text-cyan-400" />
           <div>

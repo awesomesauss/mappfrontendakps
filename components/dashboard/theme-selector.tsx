@@ -28,7 +28,7 @@ export function ThemeSelector() {
               key={t.key}
               onClick={() => setColorTheme(t.key)}
               className={cn(
-                'flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all text-left w-full',
+                'flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all text-left w-full',
                 colorTheme === t.key
                   ? 'bg-elevated text-app font-semibold'
                   : 'text-muted hover:text-app hover:bg-elevated'
@@ -45,7 +45,7 @@ export function ThemeSelector() {
           <div className="border-t border-app my-1" />
           <button
             onClick={toggleTheme}
-            className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all w-full text-muted hover:text-app hover:bg-elevated"
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all w-full text-muted hover:text-app hover:bg-elevated"
           >
             {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>

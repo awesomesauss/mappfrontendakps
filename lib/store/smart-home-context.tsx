@@ -72,8 +72,6 @@ interface SmartHomeContextType {
   toggleBlind: () => void;
   toggleMainLighting: () => void;
   setLightingBrightness: (val: number) => void;
-  toggleHvacPower: () => void;
-  setHvacTargetTemp: (val: number) => void;
   toggleSmartLock: () => void;
   toggleSecurityArm: () => void;
   toggleFanPower: () => void;
@@ -92,17 +90,15 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   const [supabaseConnected] = useState<boolean>(isSupabaseConfigured);
 
   const [deviceState, setDeviceState] = useState<DeviceState>({
-    blind: false,
-    mainLighting: true,
-    lightingBrightness: 80,
-    hvacPower: true,
-    hvacTargetTemp: 22,
-    smartLock: true,
-    securityArmState: true,
-    fanPower: false,
-    fanSpeed: 0,
-    doorLocked: true,
-  });
+      blind: false,
+      mainLighting: true,
+      lightingBrightness: 80,
+      smartLock: true,
+      securityArmState: true,
+      fanPower: false,
+      fanSpeed: 0,
+      doorLocked: true,
+    });
 
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>(generateInitialHistory());
   const [sensorData, setSensorData] = useState<SensorData>({
@@ -136,29 +132,27 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setDeviceState((prev) => {
       const next = updater(prev);
       if (supabaseConnected && supabase && !isMockMode) {
-        // device_states columns are snake_case; DeviceState is camelCase, so map explicitly
-        // instead of spreading -- a raw spread sends camelCase keys PostgREST doesn't
-        // recognize and the upsert is rejected outright (silently, since there's no .catch()).
-        supabase
-          .from('device_states')
-          .upsert([{
-            id: 1,
-            blind: next.blind,
-            main_lighting: next.mainLighting,
-            lighting_brightness: next.lightingBrightness,
-            hvac_power: next.hvacPower,
-            hvac_target_temp: next.hvacTargetTemp,
-            smart_lock: next.smartLock,
-            security_arm_state: next.securityArmState,
-            fan_power: next.fanPower,
-            fan_speed: next.fanSpeed,
-            door_locked: next.doorLocked,
-            updated_at: new Date().toISOString(),
-          }])
-          .then(({ error }) => {
-            if (error) console.error('[Supabase] device_states upsert failed:', error);
-          });
-      }
+                    // device_states columns are snake_case; DeviceState is camelCase, so map explicitly
+                    // instead of spreading -- a raw spread sends camelCase keys PostgREST doesn't
+                    // recognize and the upsert is rejected outright (silently, since there's no .catch()).
+                    supabase
+                      .from('device_states')
+                      .upsert([{
+                        id: 1,
+                        blind: next.blind,
+                        main_lighting: next.mainLighting,
+                        lighting_brightness: next.lightingBrightness,
+                        smart_lock: next.smartLock,
+                        security_arm_state: next.securityArmState,
+                        fan_power: next.fanPower,
+                        fan_speed: next.fanSpeed,
+                        door_locked: next.doorLocked,
+                        updated_at: new Date().toISOString(),
+                      }])
+                      .then(({ error }) => {
+                        if (error) console.error('[Supabase] device_states upsert failed:', error);
+                      });
+                  }
       return next;
     });
     addLog(actionDescription, 'info', 'control');
@@ -180,17 +174,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
 
   const setLightingBrightness = useCallback((val: number) => {
     setDeviceState((prev) => ({ ...prev, lightingBrightness: val }));
-  }, []);
-
-  const toggleHvacPower = useCallback(() => {
-    updateDeviceState(
-      (prev) => ({ ...prev, hvacPower: !prev.hvacPower }),
-      `HVAC Power toggled: ${!deviceState.hvacPower ? 'ACTIVATED' : 'SHUTDOWN'}`
-    );
-  }, [deviceState.hvacPower, updateDeviceState]);
-
-  const setHvacTargetTemp = useCallback((val: number) => {
-    setDeviceState((prev) => ({ ...prev, hvacTargetTemp: val }));
   }, []);
 
   const toggleSmartLock = useCallback(() => {
@@ -243,72 +226,66 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Pull the real device_states row + live-subscribe to cross-client changes
-  useEffect(() => {
-    if (!supabaseConnected || !supabase || isMockMode) return;
-    const client = supabase;
+    useEffect(() => {
+      if (!supabaseConnected || !supabase || isMockMode) return;
+      const client = supabase;
 
-    const rowToState = (row: {
-      blind: boolean;
-      main_lighting: boolean;
-      lighting_brightness: number;
-      hvac_power: boolean;
-      hvac_target_temp: number;
-      smart_lock: boolean;
-      security_arm_state: boolean;
-      fan_power: boolean;
-      fan_speed: number;
-      door_locked: boolean;
-    }) => ({
-      blind: row.blind,
-      mainLighting: row.main_lighting,
-      lightingBrightness: row.lighting_brightness,
-      hvacPower: row.hvac_power,
-      hvacTargetTemp: row.hvac_target_temp,
-      smartLock: row.smart_lock,
-      securityArmState: row.security_arm_state,
-      fanPower: row.fan_power,
-      fanSpeed: row.fan_speed,
-      doorLocked: row.door_locked,
-    });
-
-    client
-      .from('device_states')
-      .select('*')
-      .eq('id', 1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!data) return;
-        setDeviceState(rowToState(data));
+      const rowToState = (row: {
+        blind: boolean;
+        main_lighting: boolean;
+        lighting_brightness: number;
+        smart_lock: boolean;
+        security_arm_state: boolean;
+        fan_power: boolean;
+        fan_speed: number;
+        door_locked: boolean;
+      }) => ({
+        blind: row.blind,
+        mainLighting: row.main_lighting,
+        lightingBrightness: row.lighting_brightness,
+        smartLock: row.smart_lock,
+        securityArmState: row.security_arm_state,
+        fanPower: row.fan_power,
+        fanSpeed: row.fan_speed,
+        doorLocked: row.door_locked,
       });
 
-    const channel = client
-      .channel('device_states_changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'device_states' },
-        (payload) => {
-          if (!payload.new) return;
-          const row = payload.new as {
-            blind: boolean;
-            main_lighting: boolean;
-            lighting_brightness: number;
-            hvac_power: boolean;
-            hvac_target_temp: number;
-            smart_lock: boolean;
-            security_arm_state: boolean;
-            fan_power: boolean;
-            fan_speed: number;
-            door_locked: boolean;
-          };
-          setDeviceState(rowToState(row));
-        }
-      )
-      .subscribe();
+      client
+        .from('device_states')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!data) return;
+          setDeviceState(rowToState(data));
+        });
 
-    return () => {
-      client.removeChannel(channel);
-    };
-  }, [supabaseConnected, isMockMode]);
+      const channel = client
+        .channel('device_states_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'device_states' },
+          (payload) => {
+            if (!payload.new) return;
+            const row = payload.new as {
+              blind: boolean;
+              main_lighting: boolean;
+              lighting_brightness: number;
+              smart_lock: boolean;
+              security_arm_state: boolean;
+              fan_power: boolean;
+              fan_speed: number;
+              door_locked: boolean;
+            };
+            setDeviceState(rowToState(row));
+          }
+        )
+        .subscribe();
+
+      return () => {
+        client.removeChannel(channel);
+      };
+    }, [supabaseConnected, isMockMode]);
 
   // Fetch + live-subscribe to real sensor telemetry from Supabase (STM32 -> relay -> here)
   useEffect(() => {
@@ -421,79 +398,77 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
 
   // Hardware Simulation Loop (Simulating STM32/ESP-01 Telemetry Stream every 3 seconds)
   useEffect(() => {
-    if (!isSimulating) return;
-    if (supabaseConnected && !isMockMode) return; // real hardware data is live -- don't fake it
+      if (!isSimulating) return;
+      if (supabaseConnected && !isMockMode) return; // real hardware data is live -- don't fake it
 
-    const interval = setInterval(() => {
-      setSensorData((prev) => {
-        const deltaTemp = (Math.random() * 0.4 - 0.2);
-        const deltaHum = (Math.random() * 0.8 - 0.4);
-        const deltaPower = (Math.random() * 0.1 - 0.05);
+      const interval = setInterval(() => {
+        setSensorData((prev) => {
+          const deltaTemp = (Math.random() * 0.4 - 0.2);
+          const deltaHum = (Math.random() * 0.8 - 0.4);
+          const deltaPower = (Math.random() * 0.1 - 0.05);
 
-        const newTemp = Number((Math.max(18, Math.min(32, prev.temperature + deltaTemp))).toFixed(1));
-        const newHum = Number((Math.max(30, Math.min(80, prev.humidity + deltaHum))).toFixed(1));
-        const newPower = Number((Math.max(0.5, Math.min(5.0, prev.power + deltaPower))).toFixed(2));
-        const newTime = new Date().toLocaleTimeString([], { hour12: false });
+          const newTemp = Number((Math.max(18, Math.min(32, prev.temperature + deltaTemp))).toFixed(1));
+          const newHum = Number((Math.max(30, Math.min(80, prev.humidity + deltaHum))).toFixed(1));
+          const newPower = Number((Math.max(0.5, Math.min(5.0, prev.power + deltaPower))).toFixed(2));
+          const newTime = new Date().toLocaleTimeString([], { hour12: false });
 
-        // Trigger safety alert if temp spikes high
-        if (newTemp > 29.5 && prev.temperature <= 29.5) {
-          addLog(`High Temperature Warning: Sensor registered ${newTemp}°C`, 'warning', 'sensor');
-        }
+          // Trigger safety alert if temp spikes high
+          if (newTemp > 29.5 && prev.temperature <= 29.5) {
+            addLog(`High Temperature Warning: Sensor registered ${newTemp}°C`, 'warning', 'sensor');
+          }
 
-        return {
-          temperature: newTemp,
-          humidity: newHum,
-          power: newPower,
-          timestamp: newTime,
-        };
-      });
+          return {
+            temperature: newTemp,
+            humidity: newHum,
+            power: newPower,
+            timestamp: newTime,
+          };
+        });
 
-      // Update current hour in live telemetry graph
-      setTelemetryHistory((prev) => {
-        if (prev.length === 0) return prev;
-        const last = prev[prev.length - 1];
-        const updatedLast = {
-          ...last,
-          temperature: Number((last.temperature + (Math.random() * 0.2 - 0.1)).toFixed(1)),
-          humidity: Number((last.humidity + (Math.random() * 0.4 - 0.2)).toFixed(1)),
-          power: Number((last.power + (Math.random() * 0.05 - 0.025)).toFixed(2)),
-        };
-        return [...prev.slice(0, -1), updatedLast];
-      });
-    }, 3000);
+        // Update current hour in live telemetry graph
+        setTelemetryHistory((prev) => {
+          if (prev.length === 0) return prev;
+          const last = prev[prev.length - 1];
+          const updatedLast = {
+            ...last,
+            temperature: Number((last.temperature + (Math.random() * 0.2 - 0.1)).toFixed(1)),
+            humidity: Number((last.humidity + (Math.random() * 0.4 - 0.2)).toFixed(1)),
+            power: Number((last.power + (Math.random() * 0.05 - 0.025)).toFixed(2)),
+          };
+          return [...prev.slice(0, -1), updatedLast];
+        });
+      }, 3000);
 
-    return () => clearInterval(interval);
-  }, [isSimulating, addLog]);
+      return () => clearInterval(interval);
+    }, [isSimulating, addLog, supabaseConnected, isMockMode]);
 
   return (
-    <SmartHomeContext.Provider
-      value={{
-        sensorData,
-        sensorTrends,
-        telemetryHistory,
-        deviceState,
-        logs,
-        isMockMode,
-        isSimulating,
-        supabaseConnected,
-        toggleBlind,
-        toggleMainLighting,
-        setLightingBrightness,
-        toggleHvacPower,
-        setHvacTargetTemp,
-        toggleSmartLock,
-        toggleSecurityArm,
-        toggleFanPower,
-        setFanSpeed,
-        toggleDoorLock,
-        toggleMockMode,
-        toggleSimulation,
-        clearLogs,
-      }}
-    >
-      {children}
-    </SmartHomeContext.Provider>
-  );
+        <SmartHomeContext.Provider
+          value={{
+            sensorData,
+            sensorTrends,
+            telemetryHistory,
+            deviceState,
+            logs,
+            isMockMode,
+            isSimulating,
+            supabaseConnected,
+            toggleBlind,
+            toggleMainLighting,
+            setLightingBrightness,
+            toggleSmartLock,
+            toggleSecurityArm,
+            toggleFanPower,
+            setFanSpeed,
+            toggleDoorLock,
+            toggleMockMode,
+            toggleSimulation,
+            clearLogs,
+          }}
+        >
+          {children}
+        </SmartHomeContext.Provider>
+      );
 }
 
 export function useSmartHome() {
