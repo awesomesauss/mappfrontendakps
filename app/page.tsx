@@ -5,7 +5,7 @@ import { WelcomeScreen } from '@/components/dashboard/welcome-screen';
 import { HeroHeader } from '@/components/dashboard/hero-header';
 import { BentoGrid } from '@/components/dashboard/bento-grid';
 import { ThemeSelector } from '@/components/dashboard/theme-selector';
-import { Cpu, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
@@ -53,12 +53,7 @@ export default function Home() {
               <BentoGrid />
 
               {/* Footer */}
-              <footer className="mt-12 pt-6 border-t border-app flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-dim gap-4">
-                <div className="flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-orange-500" />
-                  <span>ASS Command Center • STM32 / ESP-01 Hardware Bridge</span>
-                </div>
-
+              <footer className="mt-12 pt-6 border-t border-app flex items-center justify-center text-xs font-mono text-dim gap-4">
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1 text-muted">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Hardware Sync Active

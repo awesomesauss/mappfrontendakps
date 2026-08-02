@@ -109,34 +109,27 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
           {/* Line 1 */}
           <div className="text-5xl sm:text-6xl lg:text-7xl">
             <TextReveal per="word" preset="fade-in-blur" speedReveal={1.2}>
-              The fastest way
+              Automated
             </TextReveal>
           </div>
 
-          {/* Line 2 — star to the right */}
+          {/* Line 2 — star between words */}
           <div className="text-5xl sm:text-6xl lg:text-7xl flex items-center justify-center flex-wrap gap-x-3 gap-y-0 my-0.5">
             <motion.span
               initial={{ opacity: 0, y: 20, filter: 'blur(12px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               transition={{ delay: 0.35, duration: 0.5 }}
             >
-              to control
+              Solar
             </motion.span>
+            {mounted && <StarIcon />}
             <motion.span
               initial={{ opacity: 0, y: 20, filter: 'blur(12px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               transition={{ delay: 0.45, duration: 0.5 }}
             >
-              your home
+              System
             </motion.span>
-            {mounted && <StarIcon />}
-          </div>
-
-          {/* Line 3 — dimmer */}
-          <div className="text-4xl sm:text-5xl lg:text-6xl text-muted">
-            <TextReveal per="word" preset="fade-in-blur" delay={0.3} speedReveal={1.2}>
-              in real time
-            </TextReveal>
           </div>
         </div>
 
@@ -148,7 +141,7 @@ export function WelcomeScreen({ onEnterDashboard }: WelcomeScreenProps) {
             speed={0.02}
             className="text-sm sm:text-base font-mono text-muted text-center leading-relaxed"
           >
-            Built-in UI, real-time telemetry, hardware state control, security event logs, memory, and observability.
+            Built by Quan Biao, Louis, Sean, Song Heng and Ashton.
           </TextScramble>
         </div>
 

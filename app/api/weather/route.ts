@@ -30,10 +30,22 @@ export async function GET() {
     const forecastJson = await forecastRes.json();
     const general = forecastJson.data.records[0].general;
 
+    // Pick the forecast for the current 6-hour time period instead of the
+    // blanket country-wide outlook (which is often stuck on "Thundery Showers")
+    const now = new Date();
+    const periods: { timePeriod?: { start: string; end: string }; regions?: Record<string, { text: string }> }[] =
+      forecastJson.data.records[0].periods ?? [];
+    const current = periods.find((p) => {
+      if (!p.timePeriod) return false;
+      return now >= new Date(p.timePeriod.start) && now < new Date(p.timePeriod.end);
+    });
+    const regionForecast = current?.regions?.central?.text ?? current?.regions?.south?.text;
+    const condition = regionForecast ?? general.forecast.text;
+
     return NextResponse.json({
       city: 'Singapore',
       temp: currentTemp,
-      condition: general.forecast.text,
+      condition,
       humidity: Math.round(
         (general.relativeHumidity.low + general.relativeHumidity.high) / 2
       ),

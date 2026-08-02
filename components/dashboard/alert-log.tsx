@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   Info,
   CheckCircle,
-  Radio,
   Trash2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -119,11 +118,7 @@ export function AlertLog() {
       </div>
 
       {/* Footer info */}
-      <div className="mt-3 pt-3 border-t border-app flex items-center justify-between text-[11px] text-dim">
-        <div className="flex items-center gap-1.5">
-          <Radio className="w-3 h-3 text-blue-400" />
-          <span>UART / WebSockets Active</span>
-        </div>
+      <div className="mt-3 pt-3 border-t border-app flex items-center justify-end text-[11px] text-dim">
         <span>{logs.length} Total Events</span>
       </div>
     </GlassCard>

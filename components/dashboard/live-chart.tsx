@@ -305,11 +305,9 @@ export function LiveChart({ data }: LiveChartProps) {
             }`}
           />
           <span className="text-secondary font-medium">
-            {viewOffset === 0 ? 'Socket Streaming' : 'Viewing History'}
+            {viewOffset === 0 ? 'Realtime' : 'Viewing History'}
           </span>
-          <span className="text-dim ml-2">
-            {viewOffset === 0 ? '— poke around' : `— ${dayLabel}`}
-          </span>
+          {viewOffset > 0 && <span className="text-dim ml-2">— {dayLabel}</span>}
         </div>
       </div>
     </GlassCard>

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { WeatherData } from '@/lib/types';
-import { CloudSun, CloudRain, Sun, Wind, Droplets, RefreshCw, MapPin } from 'lucide-react';
+import { CloudSun, CloudMoon, CloudRain, Sun, Moon, Wind, Droplets, RefreshCw, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function WeatherWidget() {
@@ -40,13 +40,19 @@ export function WeatherWidget() {
 
   const getWeatherIcon = (condition: string) => {
     const c = condition.toLowerCase();
+    const isNight = c.includes('night');
     if (c.includes('rain') || c.includes('drizzle') || c.includes('shower') || c.includes('thundery')) {
-      return <CloudRain className="w-10 h-10 text-cyan-400" />;
+      return <CloudRain className={`w-10 h-10 ${isNight ? 'text-blue-400' : 'text-cyan-400'}`} />;
     }
     if (c.includes('windy')) return <Wind className="w-10 h-10 text-cyan-400" />;
     if (c.includes('cloud') || c.includes('hazy') || c.includes('mist') || c.includes('fog')) {
-      return <CloudSun className="w-10 h-10 text-amber-400" />;
+      return isNight ? (
+        <CloudMoon className="w-10 h-10 text-blue-400" />
+      ) : (
+        <CloudSun className="w-10 h-10 text-amber-400" />
+      );
     }
+    if (isNight) return <Moon className="w-10 h-10 text-blue-400" />;
     return <Sun className="w-10 h-10 text-yellow-400" />;
   };
 
