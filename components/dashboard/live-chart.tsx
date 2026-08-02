@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { TelemetryHistoryPoint } from '@/lib/types';
+import { useSmartHome } from '@/lib/store/smart-home-context';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -12,7 +13,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { Activity, Thermometer, Droplets, Zap, Clock, X } from 'lucide-react';
+import { Activity, Thermometer, Droplets, Zap, Clock, X, ChevronLeft, ChevronRight, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface LiveChartProps {
@@ -26,11 +27,12 @@ function CustomTooltip({ active, payload, label }: any) {
       { label: 'Humidity', value: payload[1]?.value, unit: '%', color: 'text-cyan-400' },
       { label: 'Power', value: payload[2]?.value, unit: 'kW', color: 'text-amber-400' },
     ];
+    const date = payload[0]?.payload?.date;
     return (
       <div className="rounded-xl bg-card border border-app p-3 shadow-xl text-xs space-y-1">
         <p className="text-dim flex items-center gap-1 pb-1.5 border-b border-app">
           <Clock className="w-3 h-3 text-blue-400" />
-          <span>{label}</span>
+          <span>{date ? `${date} · ${label}` : label}</span>
         </p>
         {items.map((item, i) => (
           <p key={i} className={item.color}>
@@ -91,7 +93,7 @@ function DetailCard({ point, onClose }: { point: TelemetryHistoryPoint; onClose:
       <div className="flex items-center justify-between mb-3">
         <span className="text-[10px] font-mono text-dim flex items-center gap-1.5">
           <Clock className="w-3 h-3 text-blue-400" />
-          Snapshot at {point.time}
+          Snapshot at {point.time} · {point.date}
         </span>
         <motion.button
           onClick={onClose}
@@ -141,10 +143,15 @@ function DetailCard({ point, onClose }: { point: TelemetryHistoryPoint; onClose:
 
 export function LiveChart({ data }: LiveChartProps) {
   const [selectedPoint, setSelectedPoint] = useState<TelemetryHistoryPoint | null>(null);
+  const { viewOffset, goBackDay, goForwardDay, goToLive, isMockMode } = useSmartHome();
 
   const handleClick = useCallback((point: TelemetryHistoryPoint | null) => {
     setSelectedPoint(point);
   }, []);
+
+  const viewedDay = new Date();
+  viewedDay.setDate(viewedDay.getDate() - viewOffset);
+  const dayLabel = viewedDay.toLocaleDateString([], { weekday: 'short', day: '2-digit', month: 'short' });
 
   return (
     <GlassCard glowColor="cyan" className="col-span-1 lg:col-span-3 flex flex-col min-h-[420px]">
@@ -152,11 +159,43 @@ export function LiveChart({ data }: LiveChartProps) {
         <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
           <Activity className="w-4 h-4" />
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="text-sm font-semibold text-app">
             Environmental Telemetry Stream
           </h3>
           <p className="text-[11px] text-muted">Tap any point for a full snapshot</p>
+        </div>
+
+        {/* Date navigation */}
+        <div className="ml-auto flex items-center gap-1 shrink-0">
+          {!isMockMode && viewOffset > 0 && (
+            <button
+              onClick={goToLive}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-[10px] font-mono font-semibold transition-colors"
+            >
+              <History className="w-3 h-3" />
+              Live
+            </button>
+          )}
+          <button
+            onClick={goBackDay}
+            disabled={isMockMode}
+            title={isMockMode ? 'Unavailable in mock mode' : 'Previous day'}
+            className="p-1 rounded-lg bg-elevated text-muted hover:text-app disabled:opacity-40 transition-colors"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <span className="text-[10px] font-mono text-muted px-2 py-1 rounded-lg bg-elevated whitespace-nowrap">
+            {dayLabel}
+          </span>
+          <button
+            onClick={goForwardDay}
+            disabled={isMockMode || viewOffset === 0}
+            title={isMockMode ? 'Unavailable in mock mode' : 'Next day'}
+            className="p-1 rounded-lg bg-elevated text-muted hover:text-app disabled:opacity-40 transition-colors"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
@@ -165,7 +204,7 @@ export function LiveChart({ data }: LiveChartProps) {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               onClick={(e) => {
                 if (e?.activePayload?.[0]?.payload) {
                   handleClick(e.activePayload[0].payload as TelemetryHistoryPoint);
@@ -197,18 +236,12 @@ export function LiveChart({ data }: LiveChartProps) {
               />
               <YAxis
                 yAxisId="left"
-                stroke="#71717a"
-                fontSize={10}
-                tickLine={false}
-                axisLine={false}
+                hide
               />
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                stroke="#71717a"
-                fontSize={10}
-                tickLine={false}
-                axisLine={false}
+                hide
               />
 
               <Tooltip content={<CustomTooltip />} />
@@ -247,10 +280,18 @@ export function LiveChart({ data }: LiveChartProps) {
           </ResponsiveContainer>
         </div>
 
+        {viewOffset > 0 && data.length === 0 && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 text-center pointer-events-none">
+            <History className="w-6 h-6 text-muted" />
+            <p className="text-sm font-semibold text-secondary">No data recorded on {dayLabel}</p>
+            <p className="text-[11px] text-dim">The sensor stream was offline this day.</p>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {selectedPoint && (
             <div className="absolute inset-0 z-10 flex items-center justify-center">
-              <DetailCard key={selectedPoint.time} point={selectedPoint} onClose={() => handleClick(null)} />
+              <DetailCard key={selectedPoint.date + selectedPoint.time} point={selectedPoint} onClose={() => handleClick(null)} />
             </div>
           )}
         </AnimatePresence>
@@ -258,9 +299,17 @@ export function LiveChart({ data }: LiveChartProps) {
 
       <div className="mt-4 pt-3 border-t border-app flex items-center text-xs text-muted">
         <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
-          <span className="text-secondary font-medium">Socket Streaming</span>
-          <span className="text-dim ml-2">— poke around</span>
+          <span
+            className={`inline-block w-2 h-2 rounded-full ${
+              viewOffset === 0 ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+            }`}
+          />
+          <span className="text-secondary font-medium">
+            {viewOffset === 0 ? 'Socket Streaming' : 'Viewing History'}
+          </span>
+          <span className="text-dim ml-2">
+            {viewOffset === 0 ? '— poke around' : `— ${dayLabel}`}
+          </span>
         </div>
       </div>
     </GlassCard>

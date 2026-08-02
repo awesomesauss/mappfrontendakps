@@ -17,8 +17,12 @@ export async function GET() {
     const tempJson = await tempRes.json();
 
     // The air-temperature endpoint returns readings from multiple stations
-    // Use the first station's reading (typically Clementi or Changi)
-    const currentTemp = tempJson.data.readings[0]?.value ?? 28;
+    // under readings[0].data (each entry: { stationId, value })
+    const readings: { value: number }[] = tempJson.data.readings?.[0]?.data ?? [];
+    const avgTemp = readings.length
+      ? readings.reduce((sum, r) => sum + r.value, 0) / readings.length
+      : 28;
+    const currentTemp = Math.round(avgTemp);
 
     // Fetch forecast for condition, humidity, wind
     const forecastRes = await fetch(NEA_FORECAST_URL);
@@ -28,7 +32,7 @@ export async function GET() {
 
     return NextResponse.json({
       city: 'Singapore',
-      temp: Math.round(currentTemp),
+      temp: currentTemp,
       condition: general.forecast.text,
       humidity: Math.round(
         (general.relativeHumidity.low + general.relativeHumidity.high) / 2

@@ -37,6 +37,7 @@ export interface WeatherData {
 
 export interface TelemetryHistoryPoint {
   time: string;
+  date: string;
   temperature: number;
   humidity: number;
   power: number;

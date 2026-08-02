@@ -5,6 +5,21 @@ import { SensorData, DeviceState, AlertLog, TelemetryHistoryPoint } from '@/lib/
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 
 // Generate 24 hours of initial mock history
+function toHistoryPoint(row: {
+  created_at: string;
+  temperature: number;
+  humidity: number;
+  power: number;
+}): TelemetryHistoryPoint {
+  return {
+    time: new Date(row.created_at).toLocaleTimeString([], { hour12: false }),
+    date: new Date(row.created_at).toLocaleDateString([], { weekday: 'short', day: '2-digit', month: 'short' }),
+    temperature: Number(row.temperature),
+    humidity: Number(row.humidity),
+    power: Number(row.power),
+  };
+}
+
 function generateInitialHistory(): TelemetryHistoryPoint[] {
   const points: TelemetryHistoryPoint[] = [];
   const now = new Date();
@@ -12,6 +27,7 @@ function generateInitialHistory(): TelemetryHistoryPoint[] {
   for (let i = 23; i >= 0; i--) {
     const d = new Date(now.getTime() - i * 60 * 60 * 1000);
     const hourLabel = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const dateLabel = d.toLocaleDateString([], { weekday: 'short', day: '2-digit', month: 'short' });
     
     // Simulate diurnal temperature/power curve
     const hour = d.getHours();
@@ -21,6 +37,7 @@ function generateInitialHistory(): TelemetryHistoryPoint[] {
 
     points.push({
       time: hourLabel,
+      date: dateLabel,
       temperature: Number((tempBase + (Math.random() * 0.8 - 0.4)).toFixed(1)),
       humidity: Number((humidityBase + (Math.random() * 2 - 1)).toFixed(1)),
       power: Number((powerBase + (Math.random() * 0.2 - 0.1)).toFixed(2)),
@@ -64,6 +81,11 @@ interface SmartHomeContextType {
   sensorData: SensorData;
   sensorTrends: { tempTrend: number; humTrend: number; powerTrend: number };
   telemetryHistory: TelemetryHistoryPoint[];
+  chartData: TelemetryHistoryPoint[];
+  viewOffset: number;
+  goBackDay: () => void;
+  goForwardDay: () => void;
+  goToLive: () => void;
   deviceState: DeviceState;
   logs: AlertLog[];
   isMockMode: boolean;
@@ -101,6 +123,9 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     });
 
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>(generateInitialHistory());
+  const [viewOffset, setViewOffset] = useState<number>(0);
+  const [viewedHistory, setViewedHistory] = useState<TelemetryHistoryPoint[]>([]);
+  const chartData = viewOffset === 0 ? telemetryHistory : viewedHistory;
   const [sensorData, setSensorData] = useState<SensorData>({
     temperature: 24.2,
     humidity: 52.4,
@@ -225,6 +250,31 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setLogs([]);
   }, []);
 
+  const goBackDay = useCallback(() => setViewOffset((o) => o + 1), []);
+  const goForwardDay = useCallback(() => setViewOffset((o) => Math.max(0, o - 1)), []);
+  const goToLive = useCallback(() => setViewOffset(0), []);
+
+  // Fetch historical telemetry for the selected day (Supabase mode only)
+  useEffect(() => {
+    if (viewOffset === 0 || isMockMode || !supabaseConnected || !supabase) return;
+    const client = supabase;
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - viewOffset);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    client
+      .from('sensor_telemetry')
+      .select('*')
+      .gte('created_at', start.toISOString())
+      .lt('created_at', end.toISOString())
+      .order('created_at', { ascending: true })
+      .then(({ data }) => {
+        setViewedHistory(data && data.length ? data.map(toHistoryPoint) : []);
+      });
+  }, [viewOffset, isMockMode, supabaseConnected]);
+
   // Pull the real device_states row + live-subscribe to cross-client changes
     useEffect(() => {
       if (!supabaseConnected || !supabase || isMockMode) return;
@@ -292,18 +342,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     if (!supabaseConnected || !supabase || isMockMode) return;
     const client = supabase;
 
-    const toPoint = (row: {
-      created_at: string;
-      temperature: number;
-      humidity: number;
-      power: number;
-    }): TelemetryHistoryPoint => ({
-      time: new Date(row.created_at).toLocaleTimeString([], { hour12: false }),
-      temperature: Number(row.temperature),
-      humidity: Number(row.humidity),
-      power: Number(row.power),
-    });
-
     client
       .from('sensor_telemetry')
       .select('*')
@@ -311,7 +349,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       .limit(24)
       .then(({ data }) => {
         if (!data || data.length === 0) return;
-        setTelemetryHistory([...data].reverse().map(toPoint));
+        setTelemetryHistory([...data].reverse().map(toHistoryPoint));
         const latest = data[0];
         setSensorData({
           temperature: Number(latest.temperature),
@@ -339,7 +377,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             power: Number(row.power),
             timestamp: new Date(row.created_at).toLocaleTimeString([], { hour12: false }),
           });
-          setTelemetryHistory((prev) => [...prev.slice(-23), toPoint(row)]);
+          setTelemetryHistory((prev) => [...prev.slice(-23), toHistoryPoint(row)]);
         }
       )
       .subscribe();
@@ -448,6 +486,11 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             sensorData,
             sensorTrends,
             telemetryHistory,
+            chartData,
+            viewOffset,
+            goBackDay,
+            goForwardDay,
+            goToLive,
             deviceState,
             logs,
             isMockMode,

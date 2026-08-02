@@ -9,7 +9,7 @@ import { CommandCenter } from '@/components/dashboard/command-center';
 import { AlertLog } from '@/components/dashboard/alert-log';
 
 export function BentoGrid() {
-  const { sensorData, sensorTrends, telemetryHistory } = useSmartHome();
+  const { sensorData, sensorTrends, chartData } = useSmartHome();
 
   return (
     <div className="space-y-6">
@@ -44,7 +44,7 @@ export function BentoGrid() {
 
       {/* Main Core Controls & Telemetry Graph Grid — 3:1 split on large screens */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
-              <LiveChart data={telemetryHistory} />
+              <LiveChart data={chartData} />
               <CommandCenter />
       </div>
 

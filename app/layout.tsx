@@ -44,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} ${vt323.variable} ${shareTech.variable} font-sans antialiased min-h-screen selection:bg-orange-500 selection:text-black`}
       >

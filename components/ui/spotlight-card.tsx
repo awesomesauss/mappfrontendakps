@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -17,39 +17,44 @@ export function SpotlightCard({
   ...props
 }: SpotlightCardProps) {
   const divRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current) return;
+    if (!divRef.current || !spotlightRef.current) return;
     const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    spotlightRef.current.style.setProperty('--spot-x', `${e.clientX - rect.left}px`);
+    spotlightRef.current.style.setProperty('--spot-y', `${e.clientY - rect.top}px`);
+    spotlightRef.current.style.opacity = '1';
   };
 
-  const handleMouseEnter = () => setOpacity(1);
-  const handleMouseLeave = () => setOpacity(0);
+  const handleMouseLeave = () => {
+    if (!spotlightRef.current) return;
+    spotlightRef.current.style.opacity = '0';
+  };
 
   return (
     <motion.div
       ref={divRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        'relative rounded-3xl border border-app bg-card backdrop-blur-2xl p-6 shadow-2xl overflow-hidden transition-all duration-300 dark:hover:border-zinc-700/80 hover:border-zinc-300 group',
+        'relative rounded-3xl border border-app bg-card p-6 shadow-2xl overflow-hidden transition-colors duration-300 dark:hover:border-zinc-700/80 hover:border-zinc-300 group',
         className
       )}
       {...props}
     >
       {/* 21st.dev Mouse Spotlight Gradient */}
       <div
+        ref={spotlightRef}
         className="pointer-events-none absolute -inset-px transition-opacity duration-500 rounded-3xl"
         style={{
-          opacity,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
+          opacity: 0,
+          ['--spot-x' as string]: '0px',
+          ['--spot-y' as string]: '0px',
+          background: `radial-gradient(600px circle at var(--spot-x) var(--spot-y), ${spotlightColor}, transparent 40%)`,
         }}
       />
 
