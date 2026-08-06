@@ -5,7 +5,7 @@ import { WelcomeScreen } from '@/components/dashboard/welcome-screen';
 import { HeroHeader } from '@/components/dashboard/hero-header';
 import { BentoGrid } from '@/components/dashboard/bento-grid';
 import { ThemeSelector } from '@/components/dashboard/theme-selector';
-import { ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
@@ -51,17 +51,6 @@ export default function Home() {
 
               {/* Main Bento Grid Dashboard */}
               <BentoGrid />
-
-              {/* Footer */}
-              <footer className="mt-12 pt-6 border-t border-app flex items-center justify-center text-xs font-mono text-dim gap-4">
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1 text-muted">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Hardware Sync Active
-                  </span>
-                  <span className="text-dim">|</span>
-                  <span>Built with Next.js 14 & Framer Motion</span>
-                </div>
-              </footer>
             </div>
           </motion.main>
         )}
