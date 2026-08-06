@@ -201,8 +201,12 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   }, [deviceState.mainLighting, updateDeviceState]);
 
   const setLightingBrightness = useCallback((val: number) => {
-    setDeviceState((prev) => ({ ...prev, lightingBrightness: val }));
-  }, []);
+    const clamped = Math.max(0, Math.min(100, val));
+    updateDeviceState(
+      (prev) => ({ ...prev, lightingBrightness: clamped }),
+      `Lighting Brightness: ${clamped}%`
+    );
+  }, [updateDeviceState]);
 
   const toggleSmartLock = useCallback(() => {
     updateDeviceState(
