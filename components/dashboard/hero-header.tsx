@@ -51,7 +51,7 @@ export function HeroHeader() {
               </span>
             </div>
             <p className="text-xs text-muted">
-              Hardware Control Center & Sensor Telemetry
+              Hardware Control & Sensor Dashboard
             </p>
           </div>
         </div>
