@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS device_states (
   fan_power BOOLEAN DEFAULT FALSE,
   fan_speed INT DEFAULT 100,
   door_locked BOOLEAN DEFAULT TRUE,
+  smart_mode BOOLEAN DEFAULT FALSE,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -34,8 +35,8 @@ CREATE TABLE IF NOT EXISTS alert_logs (
 );
 
 -- Seed initial device state row
-INSERT INTO device_states (id, blind, main_lighting, lighting_brightness, smart_lock, security_arm_state, fan_power, fan_speed, door_locked)
-VALUES (1, FALSE, TRUE, 80, TRUE, TRUE, FALSE, 100, TRUE)
+INSERT INTO device_states (id, blind, main_lighting, lighting_brightness, smart_lock, security_arm_state, fan_power, fan_speed, door_locked, smart_mode)
+VALUES (1, FALSE, TRUE, 80, TRUE, TRUE, FALSE, 100, TRUE, FALSE)
 ON CONFLICT (id) DO NOTHING;
 
 -- Enable Realtime publication for tables so Next.js receives instant updates

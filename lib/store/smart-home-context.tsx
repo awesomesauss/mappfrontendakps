@@ -99,6 +99,7 @@ interface SmartHomeContextType {
   toggleFanPower: () => void;
   setFanSpeed: (val: number) => void;
   toggleDoorLock: () => void;
+  toggleSmartMode: () => void;
   toggleMockMode: () => void;
   toggleSimulation: () => void;
   clearLogs: () => void;
@@ -120,6 +121,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       fanPower: false,
       fanSpeed: 0,
       doorLocked: true,
+      smartMode: false,
     });
 
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>(generateInitialHistory());
@@ -172,6 +174,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
                         fan_power: next.fanPower,
                         fan_speed: next.fanSpeed,
                         door_locked: next.doorLocked,
+                        smart_mode: next.smartMode,
                         updated_at: new Date().toISOString(),
                       }])
                       .then(({ error }) => {
@@ -237,6 +240,13 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     );
   }, [deviceState.doorLocked, updateDeviceState]);
 
+  const toggleSmartMode = useCallback(() => {
+    updateDeviceState(
+      (prev) => ({ ...prev, smartMode: !prev.smartMode }),
+      `Smart Mode: ${!deviceState.smartMode ? 'ENABLED' : 'DISABLED'}`
+    );
+  }, [deviceState.smartMode, updateDeviceState]);
+
   const toggleMockMode = useCallback(() => {
     setIsMockMode((prev) => !prev);
     addLog(`Switched hardware mode to ${!isMockMode ? 'Mock Simulation' : 'Live Supabase Backend'}`, 'warning', 'system');
@@ -289,6 +299,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         fan_power: boolean;
         fan_speed: number;
         door_locked: boolean;
+        smart_mode: boolean;
       }) => ({
         blind: row.blind,
         mainLighting: row.main_lighting,
@@ -298,6 +309,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         fanPower: row.fan_power,
         fanSpeed: row.fan_speed,
         doorLocked: row.door_locked,
+        smartMode: row.smart_mode,
       });
 
       client
@@ -326,6 +338,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
               fan_power: boolean;
               fan_speed: number;
               door_locked: boolean;
+              smart_mode: boolean;
             };
             setDeviceState(rowToState(row));
           }
@@ -504,6 +517,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             toggleFanPower,
             setFanSpeed,
             toggleDoorLock,
+            toggleSmartMode,
             toggleMockMode,
             toggleSimulation,
             clearLogs,

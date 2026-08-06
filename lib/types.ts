@@ -14,6 +14,7 @@ export interface DeviceState {
   fanPower: boolean;       // Fan: On / Off
   fanSpeed: number;        // Fan: 0 - 100%
   doorLocked: boolean;     // Door Lock: Locked / Unlocked (separate from smartLock/curtain)
+  smartMode: boolean;      // Smart Mode: automations enabled / disabled
 }
 
 export interface AlertLog {

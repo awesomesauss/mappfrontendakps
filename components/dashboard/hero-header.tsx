@@ -4,20 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { useSmartHome } from '@/lib/store/smart-home-context';
 import { useTheme } from '@/lib/store/theme-context';
 import {
-  Activity,
   Database,
   Radio,
   Home,
   Sun,
   Moon,
+  Sparkles,
 } from 'lucide-react';
 
 export function HeroHeader() {
   const {
     isMockMode,
-    isSimulating,
     toggleMockMode,
-    toggleSimulation,
+    deviceState,
+    toggleSmartMode,
   } = useSmartHome();
   const { isDark, toggleTheme } = useTheme();
 
@@ -87,13 +87,18 @@ export function HeroHeader() {
             <span>{isMockMode ? 'Mock Hardware Mode' : 'Supabase Backend'}</span>
           </button>
 
-          {/* Simulation Stream Button */}
+          {/* Smart Mode Button */}
           <button
-            onClick={toggleSimulation}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-elevated hover:bg-zinc-300 dark:hover:bg-zinc-700 text-secondary text-xs transition-colors font-medium"
+            onClick={toggleSmartMode}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-colors font-medium ${
+              deviceState.smartMode
+                ? 'bg-blue-500/10 text-blue-400'
+                : 'bg-elevated hover:bg-zinc-300 dark:hover:bg-zinc-700 text-secondary'
+            }`}
+            title={deviceState.smartMode ? 'Smart Mode is enabled' : 'Smart Mode is disabled'}
           >
-            <Activity className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{isSimulating ? 'Pause Telemetry' : 'Resume Telemetry'}</span>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{deviceState.smartMode ? 'Smart Mode On' : 'Smart Mode Off'}</span>
           </button>
         </div>
       </div>
