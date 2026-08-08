@@ -74,11 +74,10 @@ interface SmartHomeContextType {
   setLightingBrightness: (val: number) => void;
   toggleHvacPower: () => void;
   setHvacTargetTemp: (val: number) => void;
-  toggleSmartLock: () => void;
+  toggleSmartMode: () => void;
   toggleSecurityArm: () => void;
   toggleFanPower: () => void;
   setFanSpeed: (val: number) => void;
-  toggleDoorLock: () => void;
   toggleMockMode: () => void;
   toggleSimulation: () => void;
   clearLogs: () => void;
@@ -97,11 +96,10 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     lightingBrightness: 80,
     hvacPower: true,
     hvacTargetTemp: 22,
-    smartLock: true,
+    smartMode: false,
     securityArmState: true,
     fanPower: false,
     fanSpeed: 0,
-    doorLocked: true,
   });
 
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>(generateInitialHistory());
@@ -148,11 +146,10 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             lighting_brightness: next.lightingBrightness,
             hvac_power: next.hvacPower,
             hvac_target_temp: next.hvacTargetTemp,
-            smart_lock: next.smartLock,
+            smart_mode: next.smartMode,
             security_arm_state: next.securityArmState,
             fan_power: next.fanPower,
             fan_speed: next.fanSpeed,
-            door_locked: next.doorLocked,
             updated_at: new Date().toISOString(),
           }])
           .then(({ error }) => {
@@ -167,7 +164,7 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
   const toggleBlind = useCallback(() => {
     updateDeviceState(
       (prev) => ({ ...prev, blind: !prev.blind }),
-      `Curtain/Blind: ${!deviceState.blind ? 'OPEN' : 'CLOSED'}`
+      `Blind command executed: ${!deviceState.blind ? 'OPENED' : 'CLOSED'}`
     );
   }, [deviceState.blind, updateDeviceState]);
 
@@ -193,12 +190,12 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
     setDeviceState((prev) => ({ ...prev, hvacTargetTemp: val }));
   }, []);
 
-  const toggleSmartLock = useCallback(() => {
+  const toggleSmartMode = useCallback(() => {
     updateDeviceState(
-      (prev) => ({ ...prev, smartLock: !prev.smartLock }),
-      `Smart Door Lock: ${!deviceState.smartLock ? 'LOCKED' : 'UNLOCKED'}`
+      (prev) => ({ ...prev, smartMode: !prev.smartMode }),
+      `Smart Mode toggled: ${!deviceState.smartMode ? 'ON (auto)' : 'OFF'}`
     );
-  }, [deviceState.smartLock, updateDeviceState]);
+  }, [deviceState.smartMode, updateDeviceState]);
 
   const toggleSecurityArm = useCallback(() => {
     updateDeviceState(
@@ -221,13 +218,6 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       `Fan Speed: ${clamped}%`
     );
   }, [updateDeviceState]);
-
-  const toggleDoorLock = useCallback(() => {
-    updateDeviceState(
-      (prev) => ({ ...prev, doorLocked: !prev.doorLocked }),
-      `Door Lock: ${!deviceState.doorLocked ? 'LOCKED' : 'UNLOCKED'}`
-    );
-  }, [deviceState.doorLocked, updateDeviceState]);
 
   const toggleMockMode = useCallback(() => {
     setIsMockMode((prev) => !prev);
@@ -253,22 +243,20 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
       lighting_brightness: number;
       hvac_power: boolean;
       hvac_target_temp: number;
-      smart_lock: boolean;
+      smart_mode: boolean;
       security_arm_state: boolean;
       fan_power: boolean;
       fan_speed: number;
-      door_locked: boolean;
     }) => ({
       blind: row.blind,
       mainLighting: row.main_lighting,
       lightingBrightness: row.lighting_brightness,
       hvacPower: row.hvac_power,
       hvacTargetTemp: row.hvac_target_temp,
-      smartLock: row.smart_lock,
+      smartMode: row.smart_mode,
       securityArmState: row.security_arm_state,
       fanPower: row.fan_power,
       fanSpeed: row.fan_speed,
-      doorLocked: row.door_locked,
     });
 
     client
@@ -294,11 +282,10 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
             lighting_brightness: number;
             hvac_power: boolean;
             hvac_target_temp: number;
-            smart_lock: boolean;
+            smart_mode: boolean;
             security_arm_state: boolean;
             fan_power: boolean;
             fan_speed: number;
-            door_locked: boolean;
           };
           setDeviceState(rowToState(row));
         }
@@ -481,11 +468,10 @@ export function SmartHomeProvider({ children }: { children: React.ReactNode }) {
         setLightingBrightness,
         toggleHvacPower,
         setHvacTargetTemp,
-        toggleSmartLock,
+        toggleSmartMode,
         toggleSecurityArm,
         toggleFanPower,
         setFanSpeed,
-        toggleDoorLock,
         toggleMockMode,
         toggleSimulation,
         clearLogs,

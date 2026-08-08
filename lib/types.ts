@@ -11,11 +11,10 @@ export interface DeviceState {
   lightingBrightness: number; // 0 - 100%
   hvacPower: boolean;      // On / Off
   hvacTargetTemp: number;  // 16 - 30 °C
-  smartLock: boolean;      // Smart Lock (legacy/compat): Locked / Unlocked
+  smartMode: boolean;      // Smart Mode auto-automation On / Off
   securityArmState: boolean; // Armed / Disarmed
   fanPower: boolean;       // Fan: On / Off
   fanSpeed: number;        // Fan: 0 - 100%
-  doorLocked: boolean;     // Door Lock: Locked / Unlocked (separate from smartLock/curtain)
 }
 
 export interface AlertLog {

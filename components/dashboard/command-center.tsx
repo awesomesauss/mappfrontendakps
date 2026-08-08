@@ -8,12 +8,13 @@ import {
   DoorClosed,
   DoorOpen,
   Lightbulb,
+  Sparkles,
+  ShieldCheck,
+  ShieldAlert,
   Flame,
   Sliders,
   SunMedium,
   Fan,
-  Lock,
-  Unlock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -37,14 +38,14 @@ function SwitchTile({
   activeColor,
 }: SwitchTileProps) {
   return (
-    <div className="min-h-[3.25rem] p-2.5 rounded-xl bg-elevated flex items-start justify-between gap-2">
-      <div className="flex items-center gap-2 min-w-0 flex-1 pt-0.5">
+    <div className="min-h-[3.25rem] p-2.5 rounded-xl bg-elevated flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
         <div className={cn('p-1.5 rounded-md shrink-0 transition-colors', iconClassName)}>
           {icon}
         </div>
         <div className="min-w-0">
-          <div className="text-[11px] font-semibold text-secondary font-mono truncate leading-tight">{label}</div>
-          <div className="text-[10px] font-mono text-muted truncate leading-tight">{status}</div>
+          <div className="text-[11px] font-semibold text-app font-mono truncate">{label}</div>
+          <div className="text-[10px] font-mono text-muted truncate">{status}</div>
         </div>
       </div>
       <Switch
@@ -66,9 +67,10 @@ export function CommandCenter() {
     setLightingBrightness,
     toggleHvacPower,
     setHvacTargetTemp,
+    toggleSmartMode,
+    toggleSecurityArm,
     toggleFanPower,
     setFanSpeed,
-    toggleDoorLock,
   } = useSmartHome();
 
   return (
@@ -88,7 +90,6 @@ export function CommandCenter() {
             </p>
           </div>
         </div>
-
       </div>
 
       {/* Switch Stack — single column for narrow panel */}
@@ -130,21 +131,21 @@ export function CommandCenter() {
         />
 
         <SwitchTile
-          icon={deviceState.doorLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+          icon={<Sparkles className="w-3.5 h-3.5" />}
           iconClassName={
-            deviceState.doorLocked ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
+            deviceState.smartMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-elevated text-muted'
           }
-          label="Door Lock"
+          label="Smart Mode"
           status={
             <>
-              <span className={deviceState.doorLocked ? 'text-rose-400 font-medium' : 'text-emerald-400 font-medium'}>
-                {deviceState.doorLocked ? 'LOCKED' : 'UNLOCKED'}
+              <span className={deviceState.smartMode ? 'text-emerald-400 font-medium' : 'text-dim'}>
+                {deviceState.smartMode ? 'ON (auto)' : 'OFF'}
               </span>
             </>
           }
-          checked={deviceState.doorLocked}
-          onCheckedChange={toggleDoorLock}
-          activeColor="purple"
+          checked={deviceState.smartMode}
+          onCheckedChange={toggleSmartMode}
+          activeColor="emerald"
         />
 
         <SwitchTile
@@ -166,6 +167,32 @@ export function CommandCenter() {
           activeColor="amber"
         />
 
+        <SwitchTile
+          icon={
+            deviceState.securityArmState ? (
+              <ShieldCheck className="w-3.5 h-3.5" />
+            ) : (
+              <ShieldAlert className="w-3.5 h-3.5" />
+            )
+          }
+          iconClassName={
+            deviceState.securityArmState
+              ? 'bg-purple-500/20 text-purple-400'
+              : 'bg-elevated text-muted'
+          }
+          label="Perimeter Guard"
+          status={
+            <>
+              Mode:{' '}
+              <span className={deviceState.securityArmState ? 'text-purple-400 font-medium' : 'text-dim'}>
+                {deviceState.securityArmState ? 'ARMED' : 'DISARMED'}
+              </span>
+            </>
+          }
+          checked={deviceState.securityArmState}
+          onCheckedChange={toggleSecurityArm}
+          activeColor="purple"
+        />
       </div>
 
       {/* Auxiliary Controls — stacked for narrow column */}
